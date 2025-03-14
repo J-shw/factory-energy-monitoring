@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Monitoring</title>
+</head>
+<body>
+    <h1>Flask-SocketIO Example</h1>
+    <ul id="messages"></ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script>
+        const socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect', function() {
+            console.log('Connected to server');
+        });
+
+        socket.on('mqtt_data', function(data) {
+            const messages = document.getElementById('messages');
+            const newMessage = document.createElement('li');
+            newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
+            messages.appendChild(newMessage);
+        });
+
+        function sendMessage() {
+            const message = document.getElementById('messageInput').value;
+            socket.emit('message', message);
+            document.getElementById('messageInput').value = '';
+        }
+    </script>
+</body>
+</html>
