@@ -22,7 +22,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
     try:
-        sio.emit('mqtt_message', {'topic': msg.topic, 'payload': msg.payload})
+        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
         logging.debug("mqtt_data emitted successfully")
     except Exception as e:
         logging.error(f"Error emitting mqtt_data: {e}")
