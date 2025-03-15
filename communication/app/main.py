@@ -2,14 +2,10 @@ import paho.mqtt.client as mqtt
 import logging, os, socketio
 
 logging.basicConfig(level=logging.DEBUG)
+
 mqtt_host = os.environ.get("MQTT_BROKER_HOST")
 
 sio = socketio.Client()
-
-def on_transport(transport):
-    logging.info(f"Transport method is: {transport}")
-
-sio.on('transport', on_transport)
 
 logging.debug("Attempting to connect to SocketIO server")
 try:
@@ -18,8 +14,7 @@ try:
 except Exception as e:
     logging.error(f"Error connecting to SocketIO server: {e}")
 
-
-
+# MQTT
 def on_connect(client, userdata, flags, rc):
     logging.info("MQTT connected with result code "+str(rc))
     client.subscribe("example-topic")
@@ -27,7 +22,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
     try:
-        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
+        sio.emit('mqtt_message', {'topic': msg.topic, 'payload': msg.payload})
         logging.debug("mqtt_data emitted successfully")
     except Exception as e:
         logging.error(f"Error emitting mqtt_data: {e}")
