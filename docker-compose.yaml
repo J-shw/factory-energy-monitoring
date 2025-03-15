@@ -11,10 +11,22 @@ services:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   
+  web-socket:
+    build: ./web-socket
+    ports:
+      - "8000:8000"
+  web:
+    build: ./web
+    ports:
+      - "8080:8080"
+    depends_on:
+      - web-socket
+  
   communication:
     build: ./communication
     depends_on:
       - mosquitto
+      - web-socket
     environment:
       MQTT_BROKER_HOST: mosquitto
 
@@ -24,10 +36,3 @@ services:
       - mosquitto
     environment:
       MQTT_BROKER_HOST: mosquitto
-  
-  web:
-    build: ./web
-    depends_on:
-      - mosquitto
-    ports:
-      - "8080:8080"
