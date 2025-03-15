@@ -19,9 +19,9 @@ def catch_all(event, sid, data):
 
 @sio.on('mqtt_data')
 def handle_mqtt_message(sid, data):
-    logging.debug(f'Received MQTT message: {data}')
+    logging.debug(f'Received MQTT message from client {sid}: {data}')
 
 
 if __name__ == '__main__':
     app = socketio.WSGIApp(sio)
-    wsgi.server(eventlet.listen(('', 8000)), app)
+    wsgi.server(eventlet.listen(('0.0.0.0', 8000)), app)
