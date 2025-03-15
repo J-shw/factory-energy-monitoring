@@ -13,14 +13,10 @@ def connect(sid, environ):
 def disconnect(sid):
     logging.info(f'Client {sid} disconnected')
 
-@sio.on('*')
-def catch_all(event, sid, data):
-    logging.debug(f'Received data on event {event} from client {sid}: {data}')
-
-@sio.on('mqtt_data')
-def handle_mqtt_message(sid, data):
+@sio.event
+def mqtt_data(sid, data):
     logging.debug(f'Received MQTT message from client {sid}: {data}')
-
+    sio.emit('mqtt_message', {'topic': data['topic'], 'payload': data['payload'].decode('utf-8')})
 
 if __name__ == '__main__':
     app = socketio.WSGIApp(sio)

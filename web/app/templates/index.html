@@ -18,17 +18,12 @@
             console.log('Connected to server');
         });
 
-        // socket.on('mqtt_message', function(data) {
-        //     console.log('Received message: ' + data.topic + ' ' + data.payload)
-        //     const messages = document.getElementById('messages');
-        //     const newMessage = document.createElement('li');
-        //     newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
-        //     messages.appendChild(newMessage);
-        // });
-
-        socket.on('mqtt_message', (data) => {
-            console.log('mqtt_message - Client message:', data);
-            // You can further process the 'data' object here
+        socket.on('mqtt_message', function(data) {
+            console.log('Received message: ' + data.topic + ' ' + data.payload)
+            const messages = document.getElementById('messages');
+            const newMessage = document.createElement('li');
+            newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
+            messages.appendChild(newMessage);
         });
 
         function sendMessage() {
