@@ -6,18 +6,22 @@
     <title>Energy Monitoring</title>
 </head>
 <body>
+    <button onclick="sendMessage()">Send Message</button>
     <h1>Flask-SocketIO Example</h1>
     <ul id="messages"></ul>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script>
-        const socket = io.connect('http://' + document.domain + ':' + location.port);
+        const socket = io('http://' + document.domain + ':8000', {
+            transports: ['websocket']
+        });
 
         socket.on('connect', function() {
             console.log('Connected to server');
         });
 
         socket.on('mqtt_data', function(data) {
+            console.log('Received message: ' + data.topic + ' ' + data.payload)
             const messages = document.getElementById('messages');
             const newMessage = document.createElement('li');
             newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
@@ -25,9 +29,7 @@
         });
 
         function sendMessage() {
-            const message = document.getElementById('messageInput').value;
-            socket.emit('message', message);
-            document.getElementById('messageInput').value = '';
+            socket.emit('web-message', 'From the web!');
         }
     </script>
 </body>
