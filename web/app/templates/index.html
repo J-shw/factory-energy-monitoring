@@ -1,34 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy Monitoring</title>
-</head>
-<body>
-    <button onclick="sendMessage()">Send Message</button>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+{{ super() }}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script/graph.js') }}"></script>
+<script src="{{ url_for('static', filename='script/websocket.js') }}" defer></script>
+{% endblock %}
+{% block content %}
     <h1>Flask-SocketIO Example</h1>
+    <div class="graphs">
+        <canvas id="ampsChart"></canvas>
+        <canvas id="voltsChart"></canvas>
+    </div>
+
     <ul id="messages"></ul>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script>
-        const socket = io('http://' + document.domain + ':8000', transports=['websocket']);
-
-        socket.on('connect', function() {
-            console.log('Connected to server');
-        });
-
-        socket.on('mqtt_message', function(data) {
-            console.log('Received message: ' + data.topic + ' ' + data.payload)
-            const messages = document.getElementById('messages');
-            const newMessage = document.createElement('li');
-            newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
-            messages.appendChild(newMessage);
-        });
-
-        function sendMessage() {
-            socket.emit('web-message', 'From the web!');
-        }
-    </script>
-</body>
-</html>
+{% endblock %}
