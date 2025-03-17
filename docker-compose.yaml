@@ -37,6 +37,8 @@ services:
       - "9090:9090"
     depends_on:
       - web-socket
+    environment:
+      DATABASE_URL: "postgres:password@db/factory_energy"
   
   communication:
     build: ./communication
