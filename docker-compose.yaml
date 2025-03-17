@@ -21,6 +21,12 @@ services:
       - "8080:8080"
     depends_on:
       - web-socket
+  analysis:
+    build: ./analysis
+    ports:
+      - "9090:9090"
+    depends_on:
+      - web-socket
   
   communication:
     build: ./communication
