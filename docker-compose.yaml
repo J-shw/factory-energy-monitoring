@@ -20,7 +20,14 @@ services:
       POSTGRES_DB: factory_energy
     ports:
       - "5432:5432"
-  
+  analysis:
+    build: ./analysis
+    ports:
+      - "9090:9090"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres:password@db/factory_energy"
   web-socket:
     build: ./web-socket
     ports:
@@ -31,21 +38,13 @@ services:
       - "8080:8080"
     depends_on:
       - web-socket
-  analysis:
-    build: ./analysis
-    ports:
-      - "9090:9090"
-    depends_on:
-      - web-socket
-      - db
-    environment:
-      DATABASE_URL: "postgres:password@db/factory_energy"
   
   communication:
     build: ./communication
     depends_on:
       - mosquitto
       - web-socket
+      - analysis
     environment:
       MQTT_BROKER_HOST: mosquitto
 

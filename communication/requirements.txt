@@ -1,2 +1,3 @@
 paho-mqtt
 python-socketio[client]
+requests
