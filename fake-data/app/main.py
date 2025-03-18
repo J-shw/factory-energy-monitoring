@@ -10,7 +10,7 @@ client = mqtt.Client(client_id=client_id)
 client.connect(mqtt_host, 1883, 60)
 
 def send_mqtt(topic, message):
-  logging.debug('Sending MQTT message')
+  logging.debug(f'Sending MQTT message | Topic: {topic} | Message: {message}')
   client.publish(topic, message)
 
 devices = None
@@ -28,8 +28,8 @@ except requests.exceptions.RequestException as e:
 except json.JSONDecodeError:
   logging.error("Response is not valid JSON")
 finally:
-  if devices is None:
-    logging.warning("No devices found")
+  if devices is None or len(devices) == 0:
+    logging.warning("No devices returned")
     devices = [{"name":"Device 123","description":"A sensor device","id":"522d53dd-b6ba-4c57-9972-c8f2d491d138","dateCreated":"2025-03-18T12:18:03.884939Z"}]
 
 num_devices = len(devices)
@@ -41,6 +41,7 @@ while True:
   current_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
   amps = random.randint(1,10)
   volts = random.randint(200,250)
+
   send_mqtt("energy-data", json.dumps({
     "timestamp": current_time,
     "amps": amps,
