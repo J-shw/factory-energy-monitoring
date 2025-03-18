@@ -26,7 +26,7 @@ input[type="text"] {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: var(--highlight);
     color: white;
     padding: 10px 15px;
     border: none;
@@ -36,7 +36,7 @@ button {
 }
 
 button:hover {
-    background-color: #3e8e41;
+    background-color: var(--highlighthover);
 }
 
 #response {
