@@ -16,25 +16,29 @@ def send_mqtt(topic, message):
 attempts = 3
 timeout = 5
 devices = None
+devices_loaded = False
 
 for attempt in range(attempts):
-  logging.info(f'Attempting to load devices | Attempt {attempt}/{attempts}')
-  try:
-    url = "http://devices:9002/devices/"
+  if not devices_loaded:
+    logging.info(f'Attempting to load devices | Attempt {attempt+1}/{attempts}')
+    try:
+      url = "http://devices:9002/devices/"
 
-    response = requests.get(url)
-    response.raise_for_status()
-    devices = response.json()
+      response = requests.get(url)
+      response.raise_for_status()
+      devices = response.json()
 
-    logging.info(f"Devices loaded")
+      logging.info(f"Devices loaded")
+      devices_loaded = True
 
-  except requests.exceptions.RequestException as e:
-    logging.error(f"Error: {e}")
-    time.sleep(timeout)
-  except json.JSONDecodeError:
-    logging.error("Response is not valid JSON")
-    time.sleep(timeout)
-
+    except requests.exceptions.RequestException as e:
+      logging.error(f"Error: {e}")
+      time.sleep(timeout)
+    except json.JSONDecodeError:
+      logging.error("Response is not valid JSON")
+      time.sleep(timeout)
+  else:
+    break
 
 if devices is None or len(devices) == 0:
   logging.warning("No devices returned")
