@@ -1,0 +1,76 @@
+name: Build and publish Docker Images
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "The branch to build the Docker image from"
+        required: false
+        default: "main"
+  release:
+    types: [created]
+
+env:
+  REGISTRY: ghcr.io
+  GITHUB_USER: ${{ github.actor }}
+
+jobs:
+  build-and-push-images:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      matrix:
+        image:
+          - database-management-system
+          - web-socket-server
+          - analysis-system
+          - communication-system
+          - device-management-system
+          - web-ui
+        include:
+          - image: database-management-system
+            context: ./database
+          - image: web-socket-server
+            context: ./web-socket
+          - image: analysis-system
+            context: ./analysis
+          - image: communication-system
+            context: ./communication
+          - image: device-management-system
+            context: ./devices
+          - image: web-ui
+            context: ./web
+          - image: fake-data-system
+            context: ./fake-data
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.GITHUB_USER }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/J-shw/${{ matrix.image }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
