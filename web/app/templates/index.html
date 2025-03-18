@@ -2,6 +2,7 @@
 {% block title %}Home{% endblock %}
 {% block head %}
 {{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graphs.css') }}">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,8 +12,12 @@
 {% block content %}
     <h1>Flask-SocketIO Example</h1>
     <div class="graphs">
-        <canvas id="ampsChart"></canvas>
-        <canvas id="voltsChart"></canvas>
+        <div class="graph-container">
+            <canvas id="ampsChart"></canvas>
+        </div>
+        <div class="graph-container">
+            <canvas id="voltsChart"></canvas>
+        </div>
     </div>
 
     <ul id="messages"></ul>
