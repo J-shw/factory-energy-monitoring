@@ -1,7 +1,13 @@
-.graphs {
+#charts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+#charts div {
     display: flex;
 }
-.graphs .graph-container {
+#charts div .graph-container {
     flex: 1;
     height: 300px;
     margin: 20px auto; 
