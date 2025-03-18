@@ -11,6 +11,7 @@ services:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   db:
+    image: ghcr.io/j-shw/database-management-system:latest
     build: ./database
     environment:
       POSTGRES_USER: postgres
@@ -18,6 +19,7 @@ services:
     ports:
       - "5432:5432"
   analysis:
+    image: ghcr.io/j-shw/analysis-system:latest
     build: ./analysis
     ports:
       - "9090:9090"
@@ -26,6 +28,7 @@ services:
     environment:
       DATABASE_URL: "postgres:password@db"
   devices:
+    image: ghcr.io/j-shw/device-management-system:latest
     build: ./devices
     ports:
       - "9002:9002"
@@ -34,10 +37,12 @@ services:
     environment:
       DATABASE_URL: "postgres:password@db"
   web-socket:
+    image: ghcr.io/j-shw/web-socket-server:latest
     build: ./web-socket
     ports:
       - "8000:8000"
   web:
+    image: ghcr.io/j-shw/web-ui:latest
     build: ./web
     ports:
       - "8080:8080"
@@ -45,6 +50,7 @@ services:
       - web-socket
   
   communication:
+    image: ghcr.io/j-shw/communication-system:latest
     build: ./communication
     depends_on:
       - mosquitto
@@ -54,6 +60,7 @@ services:
       MQTT_BROKER_HOST: mosquitto
 
   fake-data:
+    image: ghcr.io/j-shw/fake-data-system:latest
     build: ./fake-data
     depends_on:
       - mosquitto
