@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os, logging
+from sqlalchemy.sql import func
+import os, logging, uuid
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,12 +15,12 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-class Item(Base):
+class Device(Base):
     __tablename__ = "items"
 
-    deviceId = Column(Integer, primary_key=True, index=True)
-    timestamp = Column(DateTime)
-    deviceName = Column(Integer)
-    description = Column(Integer)
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
+    dateCreated = Column(DateTime(timezone=True), default=func.now())
+    name = Column(String)
+    description = Column(String)
 
 Base.metadata.create_all(bind=engine)
