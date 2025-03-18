@@ -17,7 +17,7 @@ except Exception as e:
 # MQTT
 def on_connect(client, userdata, flags, rc):
     logging.info("MQTT connected with result code "+str(rc))
-    client.subscribe("example-topic")
+    client.subscribe("energy-data")
 
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
