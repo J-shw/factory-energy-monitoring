@@ -4,13 +4,17 @@
     align-items: center;
     justify-content: center;
 }
-#charts div {
+#charts div h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+#charts div .collection {
     display: flex;
 }
-#charts div .graph-container {
+#charts div .collection .graph-container {
     flex: 1;
     height: 300px;
     margin: 20px auto; 
-    border: 1px solid #ccc;
     box-sizing: border-box;
 }
