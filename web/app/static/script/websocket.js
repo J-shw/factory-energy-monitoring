@@ -17,7 +17,6 @@ socket.on('mqtt_message', function(data) {
 
      try {
         const payload = JSON.parse(data.payload);
-        console.log(payload)
         updateDeviceCharts(payload);
     } catch (error) {
         console.error('Error parsing payload:', error);
