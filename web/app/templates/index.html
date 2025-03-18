@@ -1,34 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Energy Monitoring</title>
-</head>
-<body>
-    <button onclick="sendMessage()">Send Message</button>
-    <h1>Flask-SocketIO Example</h1>
-    <ul id="messages"></ul>
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/graphs.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='script/graph.js') }}"></script>
+<script src="{{ url_for('static', filename='script/websocket.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+    <div class="graphs">
+        <div class="graph-container">
+            <canvas id="ampsChart"></canvas>
+        </div>
+        <div class="graph-container">
+            <canvas id="voltsChart"></canvas>
+        </div>
+    </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script>
-        const socket = io('http://' + document.domain + ':8000', transports=['websocket']);
-
-        socket.on('connect', function() {
-            console.log('Connected to server');
-        });
-
-        socket.on('mqtt_message', function(data) {
-            console.log('Received message: ' + data.topic + ' ' + data.payload)
-            const messages = document.getElementById('messages');
-            const newMessage = document.createElement('li');
-            newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
-            messages.appendChild(newMessage);
-        });
-
-        function sendMessage() {
-            socket.emit('web-message', 'From the web!');
-        }
-    </script>
-</body>
-</html>
+    <ul id="messages" style="max-height: 100px; overflow-y: scroll;"></ul>
+{% endblock %}
