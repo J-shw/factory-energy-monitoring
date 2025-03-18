@@ -14,10 +14,22 @@ function initializeCharts() {
                 label: 'Amps',
                 data:[],
                 borderColor: 'rgb(75, 192, 192)',
-                tension: 0.1
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 0,
+                fill: false,
+                shadowColor: 'rgba(0, 0, 0, 0.2)',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2,
+                shadowBlur: 4,
             }]
         },
         options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -40,10 +52,22 @@ function initializeCharts() {
                 label: 'Volts',
                 data:[],
                 borderColor: 'rgb(255, 99, 132)',
-                tension: 0.1
+                borderWidth: 2,
+                tension: 0.3,
+                pointRadius: 0,
+                fill: false,
+                shadowColor: 'rgba(0, 0, 0, 0.2)',
+                shadowOffsetX: 2,
+                shadowOffsetY: 2,
+                shadowBlur: 4,
             }]
         },
         options: {
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
             scales: {
                 y: {
                     beginAtZero: true,
@@ -61,30 +85,21 @@ function initializeCharts() {
 function updateAmpsChart(payload) {
     console.log('Updating amps chart');
     if (ampsChart && payload.amps) {
-        ampsChart.data.labels.push(""); // Push an empty string as label
+
+        ampsChart.data.labels.push("");
         ampsChart.data.datasets[0].data.push(payload.amps);
 
-        const maxDataPoints = 20;
-        if (ampsChart.data.labels.length > maxDataPoints) {
-            ampsChart.data.labels.shift();
-            ampsChart.data.datasets[0].data.shift();
-        }
-
         ampsChart.update();
+
     }
 }
 
 function updateVoltsChart(payload) {
     console.log('Updating volts chart');
     if (voltsChart && payload.volts) {
-        voltsChart.data.labels.push(""); // Push an empty string as label
-        voltsChart.data.datasets[0].data.push(payload.volts);
 
-        const maxDataPoints = 20;
-        if (voltsChart.data.labels.length > maxDataPoints) {
-            voltsChart.data.labels.shift();
-            voltsChart.data.datasets[0].data.shift();
-        }
+        voltsChart.data.labels.push("");
+        voltsChart.data.datasets[0].data.push(payload.volts);
 
         voltsChart.update();
     }
