@@ -2,7 +2,6 @@ const socket = io('http://' + document.domain + ':8000', transports=['websocket'
 
 socket.on('connect', function() {
     console.log('Connected to server');
-    initializeCharts();
 });
 socket.on('disconnect', function() {
     console.log('Disconnected from server');
@@ -19,8 +18,7 @@ socket.on('mqtt_message', function(data) {
      try {
         const payload = JSON.parse(data.payload);
         console.log(payload)
-        updateAmpsChart(payload);
-        updateVoltsChart(payload);
+        updateDeviceCharts(payload);
     } catch (error) {
         console.error('Error parsing payload:', error);
     }
