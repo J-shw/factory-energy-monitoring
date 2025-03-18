@@ -24,7 +24,15 @@ services:
     depends_on:
       - db
     environment:
-      DATABASE_URL: "postgres:password@db/factory_energy"
+      DATABASE_URL: "postgres:password@db"
+  devices:
+    build: ./devices
+    ports:
+      - "9002:9002"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgres:password@db"
   web-socket:
     build: ./web-socket
     ports:
