@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Devices{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/device.css') }}">
+<script src="{{ url_for('static', filename='script/device.js') }}"></script>
+{% endblock %}
+{% block content %}
+<h1>Add New Device</h1>
+    <form id="deviceForm">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name"><br><br>
+
+        <label for="type">Description:</label><br>
+        <input type="text" id="description" name="type"><br><br>
+
+        <button type="button" onclick="addDevice()">Add Device</button>
+    </form>
+
+    <div id="response"></div>
+{% endblock %}
