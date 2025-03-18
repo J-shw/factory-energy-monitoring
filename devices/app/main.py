@@ -35,7 +35,7 @@ def create_item(item: DeviceCreate, db: Session = Depends(get_db)):
     return db_item
 
 @app.get("/devices/{item_id}", response_model=DeviceOut)
-def read_item(item_id: int, db: Session = Depends(get_db)):
+def read_item(item_id: str, db: Session = Depends(get_db)):
     db_item = db.query(Device).filter(Device.id == item_id).first()
     if db_item is None:
         raise HTTPException(status_code=404, detail="Item not found")

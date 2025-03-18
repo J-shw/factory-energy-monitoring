@@ -18,6 +18,7 @@ class Item(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
+    deviceId = Column(String)
     timestamp = Column(DateTime)
     amps = Column(Integer)
     volts = Column(Integer)
