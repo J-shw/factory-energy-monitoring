@@ -2,7 +2,7 @@ const socket = io('http://' + document.domain + ':8000', transports=['websocket'
 
 socket.on('connect', function() {
     console.log('Connected to server');
-    initializeChart();
+    initializeCharts();
 });
 socket.on('disconnect', function() {
     console.log('Disconnected from server');

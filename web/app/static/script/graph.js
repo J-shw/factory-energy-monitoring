@@ -1,23 +1,29 @@
-function initializeChart() {
+let voltsChart = null;
+let ampsChart = null;
+
+function initializeCharts() {
+    console.log('Initializing charts');
+
     // Amps Chart
     const ampsCtx = document.getElementById('ampsChart').getContext('2d');
     ampsChart = new Chart(ampsCtx, {
         type: 'line',
         data: {
-            labels: [],
+            labels:[],
             datasets: [{
                 label: 'Amps',
-                data: [],
+                data:[],
                 borderColor: 'rgb(75, 192, 192)',
                 tension: 0.1
             }]
         },
         options: {
             scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'second'
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Amps (A)'
                     }
                 }
             }
@@ -29,32 +35,33 @@ function initializeChart() {
     voltsChart = new Chart(voltsCtx, {
         type: 'line',
         data: {
-            labels: [],
+            labels:[],
             datasets: [{
                 label: 'Volts',
-                data: [],
+                data:[],
                 borderColor: 'rgb(255, 99, 132)',
                 tension: 0.1
             }]
         },
         options: {
             scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'second'
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Volts (V)'
                     }
                 }
             }
         }
     });
+    console.log('Charts initialized');
 }
 
-
 function updateAmpsChart(payload) {
-    if (ampsChart && payload.timestamp && payload.amps) {
-        const timestamp = new Date(payload.timestamp);
-        ampsChart.data.labels.push(timestamp);
+    console.log('Updating amps chart');
+    if (ampsChart && payload.amps) {
+        ampsChart.data.labels.push(""); // Push an empty string as label
         ampsChart.data.datasets[0].data.push(payload.amps);
 
         const maxDataPoints = 20;
@@ -68,9 +75,9 @@ function updateAmpsChart(payload) {
 }
 
 function updateVoltsChart(payload) {
-    if (voltsChart && payload.timestamp && payload.volts) {
-        const timestamp = new Date(payload.timestamp);
-        voltsChart.data.labels.push(timestamp);
+    console.log('Updating volts chart');
+    if (voltsChart && payload.volts) {
+        voltsChart.data.labels.push(""); // Push an empty string as label
         voltsChart.data.datasets[0].data.push(payload.volts);
 
         const maxDataPoints = 20;
