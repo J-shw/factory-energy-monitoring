@@ -1,67 +1,56 @@
 const deviceCharts = {};
 
-function createDeviceChart(deviceId) {
-    let deviceName = 'None'
-    
-    fetch('/devices/' + deviceId)
-    .then(response => {
-        if (!response.ok) {
-        throw new Error(`HTTP error - status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-        deviceName = data.name;
-        console.log(deviceName);
+function createDeviceChart(deviceId, deviceName) {
+    const charts = document.getElementById('charts');
 
-        const charts = document.getElementById('charts');
-        const deviceArea = document.createElement('div');
-        deviceArea.id = `deviceArea-${deviceId}`;
+    const collection = document.createElement('div');
+    collection.classList.add('collection');
 
-        const ampChartContainer = document.createElement('div');
-        const voltsChartContainer = document.createElement('div');
+    const deviceArea = document.createElement('div');
+    deviceArea.id = `deviceArea-${deviceId}`;
 
-        const ampsCanvas = document.createElement('canvas');
-        ampsCanvas.id = `ampsChart-${deviceId}`;
-        ampChartContainer.classList.add('chart-container');
-        ampChartContainer.appendChild(ampsCanvas);
+    const ampChartContainer = document.createElement('div');
+    const voltsChartContainer = document.createElement('div');
 
-        const voltsCanvas = document.createElement('canvas');
-        voltsCanvas.id = `voltsChart-${deviceId}`;
-        voltsChartContainer.classList.add('chart-container');
-        voltsChartContainer.appendChild(voltsCanvas);
+    const ampsCanvas = document.createElement('canvas');
+    ampsCanvas.id = `ampsChart-${deviceId}`;
+    ampChartContainer.classList.add('chart-container');
+    ampChartContainer.appendChild(ampsCanvas);
 
-        const title = document.createElement('h2');
-        title.textContent = deviceName;
+    const voltsCanvas = document.createElement('canvas');
+    voltsCanvas.id = `voltsChart-${deviceId}`;
+    voltsChartContainer.classList.add('chart-container');
+    voltsChartContainer.appendChild(voltsCanvas);
 
-        deviceArea.appendChild(title);
-        deviceArea.appendChild(ampChartContainer);
-        deviceArea.appendChild(voltsChartContainer);
+    const title = document.createElement('h2');
+    title.textContent = deviceName;
 
-        charts.appendChild(deviceArea);
+    collection.appendChild(ampChartContainer);
+    collection.appendChild(voltsChartContainer)
 
-        const ampsCtx = ampsCanvas.getContext('2d');
-        const voltsCtx = voltsCanvas.getContext('2d');
+    deviceArea.appendChild(title);
+    deviceArea.appendChild(collection);
 
-        const ampsChart = new Chart(ampsCtx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Amps', data: [], borderColor: 'rgb(75, 192, 192)', borderWidth: 2, tension: 0.3, pointRadius: 0, fill: false, shadowColor: 'rgba(0, 0, 0, 0.2)', shadowOffsetX: 2, shadowOffsetY: 2, shadowBlur: 4, }] },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Amps (A)' } } } }
-        });
+    charts.appendChild(deviceArea);
 
-        const voltsChart = new Chart(voltsCtx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: 'Volts', data: [], borderColor: 'rgb(255, 99, 132)', borderWidth: 2, tension: 0.3, pointRadius: 0, fill: false, shadowColor: 'rgba(0, 0, 0, 0.2)', shadowOffsetX: 2, shadowOffsetY: 2, shadowBlur: 4, }] },
-            options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, title: { display: true, text: 'Volts (V)' } } } }
-        });
+    const ampsCtx = ampsCanvas.getContext('2d');
+    const voltsCtx = voltsCanvas.getContext('2d');
 
-        // Store charts in the deviceCharts object
-        deviceCharts[deviceId] = { ampsChart, voltsChart };
-    })
-    .catch(error => {
-        console.error('Failed to fetch device data:', error);
+    const ampsChart = new Chart(ampsCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Amps', data: [], borderColor: 'rgb(75, 192, 192)', borderWidth: 2, tension: 0.3, pointRadius: 0, fill: false, shadowColor: 'rgba(0, 0, 0, 0.2)', shadowOffsetX: 2, shadowOffsetY: 2, shadowBlur: 4, }] },
+        options: { plugins: { legend: { display: false } }, scales: { x: {type: 'time', time: {unit: 'second', tooltipFormat: 'YYYY-MM-DD HH:mm:ss', displayFormats: { second: 'HH:mm:ss', minute: 'HH:mm', hour: 'HH:00', day: 'YYYY-MM-DD' } }, title: { display: true, text: 'Time' } }, y: { beginAtZero: true, title: { display: true, text: 'Amps (A)' } } } }
     });
+
+    const voltsChart = new Chart(voltsCtx, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Volts', data: [], borderColor: 'rgb(255, 99, 132)', borderWidth: 2, tension: 0.3, pointRadius: 0, fill: false, shadowColor: 'rgba(0, 0, 0, 0.2)', shadowOffsetX: 2, shadowOffsetY: 2, shadowBlur: 4, }] },
+        options: { plugins: { legend: { display: false } }, scales: { x: {type: 'time', time: {unit: 'second', tooltipFormat: 'YYYY-MM-DD HH:mm:ss', displayFormats: { second: 'HH:mm:ss', minute: 'HH:mm', hour: 'HH:00', day: 'YYYY-MM-DD' } }, title: { display: true, text: 'Time' } }, y: { beginAtZero: true, title: { display: true, text: 'Volts (V)' } } } }
+    });
+
+    // Store charts in the deviceCharts object
+    deviceCharts[deviceId] = { ampsChart, voltsChart };
+    
 }
 
 function updateDeviceCharts(payload) {
@@ -69,7 +58,21 @@ function updateDeviceCharts(payload) {
     console.log(deviceId)
 
     if (!deviceCharts[deviceId]) {
-        createDeviceChart(deviceId);
+        let deviceName = 'Unkown Device'
+        fetch('/devices/' + deviceId)
+        .then(response => {
+            if (!response.ok) {
+            throw new Error(`HTTP error - status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            createDeviceChart(deviceId, data.name);
+        })
+        .catch(error => {
+            console.error('Failed to fetch device data:', error);
+            createDeviceChart(deviceId, deviceName);
+        });
     }
 
     const { ampsChart, voltsChart } = deviceCharts[deviceId];
