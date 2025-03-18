@@ -11,13 +11,10 @@ services:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   db:
-    image: postgres:latest
-    container_name: postgres
-    restart: unless-stopped
+    build: ./database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: factory_energy
     ports:
       - "5432:5432"
   analysis:
