@@ -33,7 +33,7 @@ def on_message(client, userdata, msg):
         response = requests.post(url, data=msg.payload, headers=headers)
         response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
 
-        logging.info("Response Status Code:", response.status_code)
+        logging.info(f"Response Status Code: {response.status_code}")
 
     except requests.exceptions.RequestException as e:
         logging.error(f"Error: {e}")
