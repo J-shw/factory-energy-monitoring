@@ -10,7 +10,6 @@
 <script src="{{ url_for('static', filename='script/websocket.js') }}" defer></script>
 {% endblock %}
 {% block content %}
-    <h1>Flask-SocketIO Example</h1>
     <div class="graphs">
         <div class="graph-container">
             <canvas id="ampsChart"></canvas>
@@ -20,5 +19,5 @@
         </div>
     </div>
 
-    <ul id="messages"></ul>
+    <ul id="messages" style="max-height: 100px; overflow-y: scroll;"></ul>
 {% endblock %}
