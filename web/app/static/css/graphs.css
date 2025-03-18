@@ -1,16 +1,26 @@
 #charts {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    height: 70vh;
+    overflow: scroll;
 }
-#charts div {
+#charts div h2 {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+#charts div .collection {
     display: flex;
 }
-#charts div .graph-container {
+#charts div .collection .graph-container {
     flex: 1;
     height: 300px;
     margin: 20px auto; 
-    border: 1px solid #ccc;
     box-sizing: border-box;
+}
+
+#messages {
+    height: 20vh;
+    overflow: scroll;
 }

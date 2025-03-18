@@ -33,8 +33,7 @@ body {
 }
 
 #content {
-    height: calc(98vh - 90px);
-    margin-top: 10px;
+    height: calc(98vh - 10px);
 }
 #footer {
     padding: 5px;

@@ -30,7 +30,7 @@ except json.JSONDecodeError:
 finally:
   if devices is None or len(devices) == 0:
     logging.warning("No devices returned")
-    devices = [{"name":"Device 123","description":"A sensor device","id":"522d53dd-b6ba-4c57-9972-c8f2d491d138","dateCreated":"2025-03-18T12:18:03.884939Z"}]
+    devices = [{"name":"Fake Device","description":"Fake Sensor due to no devices being registered","id":"fake-id-here","dateCreated":"2025-03-18T12:18:03.884939Z"}]
 
 num_devices = len(devices)
 logging.info(f"Number of devices: {num_devices}")
