@@ -29,6 +29,7 @@ jobs:
           - communication-system
           - device-management-system
           - web-ui
+          - fake-data-system
         include:
           - image: database-management-system
             context: ./database
