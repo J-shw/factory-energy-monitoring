@@ -10,6 +10,7 @@ class ItemBase(BaseModel):
     timestamp: datetime.datetime
     amps: int
     volts: int
+    deviceId: str
 
 class ItemCreate(ItemBase):
     pass
