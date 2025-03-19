@@ -1,23 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
-from models import Device, SessionLocal
-from typing import Optional
-from uuid import UUID
-import datetime, uvicorn
+from models import Device, SessionLocal, DeviceOut, DeviceCreate
+import uvicorn
 
 app = FastAPI()
-
-class DeviceCreate(BaseModel):
-    name: str
-    description: Optional[str] = None
-
-class DeviceOut(DeviceCreate):
-    id: UUID
-    dateCreated: datetime.datetime
-
-    class Config:
-        orm_mode = True
 
 def get_db():
     db = SessionLocal()

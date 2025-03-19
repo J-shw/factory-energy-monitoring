@@ -1,8 +1,10 @@
-from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, UUID
+from sqlalchemy import create_engine, Column, PickleType, Boolean, String, Float, DateTime, UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
-import os, logging, uuid
+from pydantic import BaseModel
+from typing import Optional
+import os, logging, uuid, datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,10 +23,30 @@ class Device(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     dateCreated = Column(DateTime(timezone=True), default=func.now())
     name = Column(String)
-    description = Column(String)
-    type = Column(String)
+    description = Column(String, nullable=True)
+    location = Column(String, nullable=True)
     voltage = Column(Float, nullable=True)
-    current_rating_amps = Column(Float, nullable=True)
+    currentRatingAmps = Column(Float, nullable=True)
     isActive = Column(Boolean, default=True)
-
+    alertsConfiguration = Column(PickleType, nullable=True)
+# "Alerts and Notifications": {
+#         "high_low_voltage": true,
+#         "overcurrent": true,
+#         "power_outage": true,
+#     },
 Base.metadata.create_all(bind=engine)
+
+class DeviceCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    location: Optional[str] = None
+    voltage: Optional[float] = None
+    currentRatingAmps: Optional[float] = None
+    alertsConfiguration: Optional[str] = None
+
+class DeviceOut(DeviceCreate):
+    id: uuid.UUID
+    dateCreated: datetime.datetime
+
+    class Config:
+        orm_mode = True
