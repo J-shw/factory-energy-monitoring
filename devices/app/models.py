@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, UUID
+from sqlalchemy import create_engine, Column, Integer, Boolean, String, Float, DateTime, UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
@@ -22,5 +22,9 @@ class Device(Base):
     dateCreated = Column(DateTime(timezone=True), default=func.now())
     name = Column(String)
     description = Column(String)
+    type = Column(String)
+    voltage = Column(Float, nullable=True)
+    current_rating_amps = Column(Float, nullable=True)
+    isActive = Column(Boolean, default=True)
 
 Base.metadata.create_all(bind=engine)
