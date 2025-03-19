@@ -29,7 +29,7 @@ class Device(Base):
     currentRatingAmps = Column(Float, nullable=True)
     isActive = Column(Boolean, default=True)
     alertsConfiguration = Column(PickleType, nullable=True)
-# "Alerts and Notifications": {
+# "alertsConfiguration": {
 #         "high_low_voltage": true,
 #         "overcurrent": true,
 #         "power_outage": true,
