@@ -42,7 +42,7 @@ class DeviceCreate(BaseModel):
     location: Optional[str] = None
     voltage: Optional[float] = None
     currentRatingAmps: Optional[float] = None
-    alertsConfiguration: Optional[str] = None
+    alertsConfiguration: Optional[dict] = None
 
 class DeviceOut(DeviceCreate):
     id: uuid.UUID
