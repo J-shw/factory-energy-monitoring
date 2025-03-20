@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine, Column, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import os, logging
+from pydantic import BaseModel
+import os, logging, datetime
 
 logging.basicConfig(level=logging.INFO)
 
@@ -24,3 +25,15 @@ class Item(Base):
     volts = Column(Integer)
 
 Base.metadata.create_all(bind=engine)
+
+class ItemBase(BaseModel):
+    timestamp: datetime.datetime
+    amps: int
+    volts: int
+    deviceId: str
+
+class ItemCreate(ItemBase):
+    pass
+
+class ItemOut(ItemBase):
+    id: int
