@@ -1,7 +1,8 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pydantic import BaseModel
+from typing import Optional
 import os, logging, datetime
 
 logging.basicConfig(level=logging.INFO)
@@ -15,25 +16,30 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-class Item(Base):
+class Event(Base):
     __tablename__ = "items"
 
     id = Column(Integer, primary_key=True, index=True)
+    logId = Column(Integer) # Needs to correspond to the log entry that was processed
     deviceId = Column(String)
     timestamp = Column(DateTime)
-    amps = Column(Integer)
-    volts = Column(Integer)
+    overCurrent = Column(Boolean, default=False)
+    highLowVoltage = Column(Boolean, default=False)
+    powerOutage = Column(Boolean, default=False)
+    
 
 Base.metadata.create_all(bind=engine)
 
-class ItemBase(BaseModel):
-    timestamp: datetime.datetime
-    amps: int
-    volts: int
+class EventCreate(BaseModel):
+    logId: int
     deviceId: str
+    timestamp: datetime.datetime
+    overCurrent: Optional[bool] = False
+    highLowVoltage: Optional[bool] = False
+    powerOutage: Optional[bool] = False
 
-class ItemCreate(ItemBase):
-    pass
-
-class ItemOut(ItemBase):
+class EventOut(EventCreate):
     id: int
+
+    class Config:
+        orm_mode = True
