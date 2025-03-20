@@ -60,8 +60,8 @@ while True:
 
   send_mqtt("energy-data", json.dumps({
     "timestamp": current_time,
-    "amps": amps,
-    "volts": volts,
+    "amps": round(amps,2),
+    "volts": round(volts,2),
     "deviceId": device["id"]
   }))
   time.sleep(sleep)
