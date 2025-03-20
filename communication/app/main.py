@@ -1,4 +1,6 @@
 import paho.mqtt.client as mqtt
+from sqlalchemy.orm import Session
+from models import Log, SessionLocal, LogCreate, LogOut
 import logging, os, socketio, json, requests
 
 logging.basicConfig(level=logging.DEBUG)
@@ -26,19 +28,37 @@ def on_message(client, userdata, msg):
         logging.debug("mqtt_data emitted successfully")
     except Exception as e:
         logging.error(f"Error emitting mqtt_data: {e}")
+    # try: # Stream data for analysis
+    #     url = "http://analysis:9090/events/"
+    #     headers = {"Content-Type": "application/json"}
+
+    #     response = requests.post(url, data=msg.payload, headers=headers)
+    #     response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+
+    #     logging.info(f"Response Status Code: {response.status_code}")
+
+    # except requests.exceptions.RequestException as e:
+    #     logging.error(f"Error: {e}")
+    # except json.JSONDecodeError:
+    #     logging.error("Response is not valid JSON")
     try:
-        url = "http://analysis:9090/items/"
-        headers = {"Content-Type": "application/json"}
+        db = SessionLocal()
+        payload_str = msg.payload.decode('utf-8')
+        payload_create = LogCreate(**json.loads(payload_str))
+        log_entry = Log(**payload_create.dict())
 
-        response = requests.post(url, data=msg.payload, headers=headers)
-        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+        db.add(log_entry)
+        db.commit()
+        db.refresh(log_entry)
+        db.close()
+        logging.info("Log entry added to database")
 
-        logging.info(f"Response Status Code: {response.status_code}")
+    except Exception as e:
+        logging.warning(f"Error adding log entry: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error: {e}")
-    except json.JSONDecodeError:
-        logging.error("Response is not valid JSON")
 
 client_id = "communication_system"
 client = mqtt.Client(client_id=client_id)
