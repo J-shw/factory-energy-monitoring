@@ -21,9 +21,9 @@ class Limit(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     deviceId = Column(String)
-    overCurrentValue = Column(Float)
-    highVoltageValue = Column(Float)
-    lowVoltageValue = Column(Float)
+    overCurrentValue = Column(Float, nullable=True)
+    highVoltageValue = Column(Float, nullable=True)
+    lowVoltageValue = Column(Float, nullable=True)
 
 class Event(Base):
     __tablename__ = "events"
@@ -38,6 +38,18 @@ class Event(Base):
     
 
 Base.metadata.create_all(bind=engine)
+
+class LimitCreate(BaseModel):
+    deviceId: str
+    overCurrentValue: Optional[float] = None
+    highVoltageValue: Optional[float] = None
+    lowVoltageValue: Optional[float] = None
+
+class LimitOut(LimitCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 class EventCreate(BaseModel):
     logId: int
