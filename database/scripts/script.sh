@@ -1,6 +1,7 @@
 files=(
   'devices'
   'analysis'
+  'communication'
   )
 
 folders=(
