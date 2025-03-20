@@ -11,8 +11,8 @@ sio = socketio.Client()
 
 logging.debug("Attempting to connect to SocketIO server")
 try:
-    sio.connect('http://web-socket:8000', transports=['websocket'])
-    logging.debug("Connected to SocketIO server successfully")
+    sio.connect('http://web:8080', transports=['websocket'])
+    logging.info("Connected to SocketIO server successfully")
 except Exception as e:
     logging.error(f"Error connecting to SocketIO server: {e}")
 
