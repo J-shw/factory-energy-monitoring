@@ -1,4 +1,4 @@
-const socket = io('http://' + document.domain + ':8000', transports=['websocket']);
+const socket = io('', transports=['websocket']);
 
 socket.on('connect', function() {
     console.log('Connected to server');

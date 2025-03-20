@@ -1,10 +1,12 @@
 from flask import Flask, render_template, jsonify, request
+from flask_socketio import SocketIO, emit
 from waitress import serve
-import logging, requests
+import logging, requests, eventlet
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
+socketio = SocketIO(app)
 
 @app.route('/')
 def index_page():
@@ -49,7 +51,19 @@ def add_device():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
-if __name__ == "__main__":
-    logging.info("Starting web server with waitress")
-    serve(app, host='0.0.0.0', port=8080)
+@socketio.on('connect')
+def connect():
+    logging.info(f'Client connected')
 
+@socketio.on('disconnect')
+def disconnect():
+    logging.info(f'Client disconnected')
+
+@socketio.on('mqtt_data')
+def handle_mqtt_data(data):
+    logging.debug(f'Received MQTT message: {data}')
+    emit('mqtt_message', {'topic': data['topic'], 'payload': data['payload'].decode('utf-8')}, broadcast=True)
+
+if __name__ == "__main__":
+    logging.info("Starting web systems")
+    eventlet.wsgi.server(eventlet.listen(('0.0.0.0', 8080)), app)
