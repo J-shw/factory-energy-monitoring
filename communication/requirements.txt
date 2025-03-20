@@ -1,3 +1,6 @@
 paho-mqtt
 python-socketio[client]
 requests
+sqlalchemy
+pydantic
+psycopg2-binary
