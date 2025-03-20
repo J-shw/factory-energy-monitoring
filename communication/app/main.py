@@ -44,9 +44,8 @@ def on_message(client, userdata, msg):
     try:
         db = SessionLocal()
         payload_str = msg.payload.decode('utf-8')
-        payload_dict = json.loads(payload_str)
-
-        log_entry = Log(**payload_dict) #unpack the dictionary into the Log constructor.
+        payload_create = LogCreate(**json.loads(payload_str))
+        log_entry = Log(**payload_create.dict())
 
         db.add(log_entry)
         db.commit()
