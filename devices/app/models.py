@@ -40,9 +40,9 @@ class DeviceCreate(BaseModel):
     location: Optional[str] = None
     voltage: Optional[float] = None
     currentRatingAmps: Optional[float] = None
-    highLowVoltage: Optional[bool] = None
-    overCurrent: Optional[bool] = None
-    powerOutage: Optional[bool] = None
+    highLowVoltage: Optional[bool] = False
+    overCurrent: Optional[bool] = False
+    powerOutage: Optional[bool] = False
 
 class DeviceOut(DeviceCreate):
     id: uuid.UUID
