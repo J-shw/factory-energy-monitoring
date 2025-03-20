@@ -12,7 +12,7 @@ services:
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   db:
     image: ghcr.io/j-shw/database-management-system:latest
-    # build: ./database
+    build: ./database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
@@ -58,6 +58,7 @@ services:
       - analysis
     environment:
       MQTT_BROKER_HOST: mosquitto
+      DATABASE_URL: "postgres:password@db"
 
   fake-data:
     image: ghcr.io/j-shw/fake-data-system:latest
