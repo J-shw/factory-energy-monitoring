@@ -28,19 +28,19 @@ def on_message(client, userdata, msg):
         logging.debug("mqtt_data emitted successfully")
     except Exception as e:
         logging.error(f"Error emitting mqtt_data: {e}")
-    try:
-        url = "http://analysis:9090/events/"
-        headers = {"Content-Type": "application/json"}
+    # try: # Stream data for analysis
+    #     url = "http://analysis:9090/events/"
+    #     headers = {"Content-Type": "application/json"}
 
-        response = requests.post(url, data=msg.payload, headers=headers)
-        response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
+    #     response = requests.post(url, data=msg.payload, headers=headers)
+    #     response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
 
-        logging.info(f"Response Status Code: {response.status_code}")
+    #     logging.info(f"Response Status Code: {response.status_code}")
 
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error: {e}")
-    except json.JSONDecodeError:
-        logging.error("Response is not valid JSON")
+    # except requests.exceptions.RequestException as e:
+    #     logging.error(f"Error: {e}")
+    # except json.JSONDecodeError:
+    #     logging.error("Response is not valid JSON")
     try:
         db = SessionLocal()
         payload_str = msg.payload.decode('utf-8')
