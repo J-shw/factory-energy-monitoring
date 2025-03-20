@@ -1,4 +1,6 @@
 import paho.mqtt.client as mqtt
+from sqlalchemy.orm import Session
+from models import Log, SessionLocal, LogCreate, LogOut
 import logging, os, socketio, json, requests
 
 logging.basicConfig(level=logging.DEBUG)
@@ -39,6 +41,25 @@ def on_message(client, userdata, msg):
         logging.error(f"Error: {e}")
     except json.JSONDecodeError:
         logging.error("Response is not valid JSON")
+    try:
+        db = SessionLocal()
+        payload_str = msg.payload.decode('utf-8')
+        payload_dict = json.loads(payload_str)
+
+        log_entry = Log(**payload_dict) #unpack the dictionary into the Log constructor.
+
+        db.add(log_entry)
+        db.commit()
+        db.refresh(log_entry)
+        db.close()
+        logging.info("Log entry added to database")
+
+    except Exception as e:
+        logging.warning(f"Error adding log entry: {e}")
+        db.rollback()
+    finally:
+        db.close()
+
 
 client_id = "communication_system"
 client = mqtt.Client(client_id=client_id)
