@@ -28,12 +28,10 @@ class Device(Base):
     voltage = Column(Float, nullable=True)
     currentRatingAmps = Column(Float, nullable=True)
     isActive = Column(Boolean, default=True)
-    alertsConfiguration = Column(PickleType, nullable=True)
-# "alertsConfiguration": {
-#         "high_low_voltage": true,
-#         "overcurrent": true,
-#         "power_outage": true,
-#     },
+    highLowVoltage = Column(Boolean, default=True)
+    overCurrent = Column(Boolean, default=True)
+    powerOutage = Column(Boolean, default=True)
+
 Base.metadata.create_all(bind=engine)
 
 class DeviceCreate(BaseModel):
@@ -42,7 +40,9 @@ class DeviceCreate(BaseModel):
     location: Optional[str] = None
     voltage: Optional[float] = None
     currentRatingAmps: Optional[float] = None
-    alertsConfiguration: Optional[dict] = None
+    highLowVoltage: Optional[float] = None
+    overCurrent: Optional[float] = None
+    powerOutage: Optional[float] = None
 
 class DeviceOut(DeviceCreate):
     id: uuid.UUID
