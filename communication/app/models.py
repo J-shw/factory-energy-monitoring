@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pydantic import BaseModel
@@ -21,16 +21,16 @@ class Log(Base):
     id = Column(Integer, primary_key=True, index=True)
     deviceId = Column(String)
     timestamp = Column(DateTime)
-    amps = Column(Integer)
-    volts = Column(Integer)
+    amps = Column(Float)
+    volts = Column(Float)
 
 Base.metadata.create_all(bind=engine)
 
 class LogBase(BaseModel):
     deviceId: str
     timestamp: datetime.datetime
-    amps: int
-    volts: int
+    amps: float
+    volts: float
 
 class LogCreate(LogBase):
     pass
