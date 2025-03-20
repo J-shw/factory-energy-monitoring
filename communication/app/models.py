@@ -8,7 +8,7 @@ logging.basicConfig(level=logging.INFO)
 
 database_url_env = os.environ.get("DATABASE_URL")
 
-DATABASE_URL = f"postgresql://{database_url_env}/factory_energy"
+DATABASE_URL = f"postgresql://{database_url_env}/factory_energy_logs"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
