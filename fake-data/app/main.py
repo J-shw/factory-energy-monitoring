@@ -50,13 +50,13 @@ logging.info(f"Number of devices: {num_devices}")
 
 while True:
   device = random.choice(devices)
-  
+
   voltage_ten_percent=device["voltage"]*0.1
   
   sleep = random.uniform(0.1,1)
   current_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
-  amps = random.randint(0,device['currentRatingAmps'])
-  volts = random.randint(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
+  amps = random.uniform(0,device['currentRatingAmps'])
+  volts = random.uniform(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
 
   send_mqtt("energy-data", json.dumps({
     "timestamp": current_time,
