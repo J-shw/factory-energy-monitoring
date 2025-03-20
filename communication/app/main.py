@@ -29,7 +29,7 @@ def on_message(client, userdata, msg):
     except Exception as e:
         logging.error(f"Error emitting mqtt_data: {e}")
     try:
-        url = "http://analysis:9090/items/"
+        url = "http://analysis:9090/events/"
         headers = {"Content-Type": "application/json"}
 
         response = requests.post(url, data=msg.payload, headers=headers)
