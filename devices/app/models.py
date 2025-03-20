@@ -18,7 +18,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 class Device(Base):
-    __tablename__ = "items"
+    __tablename__ = "Devices"
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     dateCreated = Column(DateTime(timezone=True), default=func.now())
@@ -28,12 +28,10 @@ class Device(Base):
     voltage = Column(Float, nullable=True)
     currentRatingAmps = Column(Float, nullable=True)
     isActive = Column(Boolean, default=True)
-    alertsConfiguration = Column(PickleType, nullable=True)
-# "alertsConfiguration": {
-#         "high_low_voltage": true,
-#         "overcurrent": true,
-#         "power_outage": true,
-#     },
+    highLowVoltage = Column(Boolean, default=True)
+    overCurrent = Column(Boolean, default=True)
+    powerOutage = Column(Boolean, default=True)
+
 Base.metadata.create_all(bind=engine)
 
 class DeviceCreate(BaseModel):
@@ -42,7 +40,9 @@ class DeviceCreate(BaseModel):
     location: Optional[str] = None
     voltage: Optional[float] = None
     currentRatingAmps: Optional[float] = None
-    alertsConfiguration: Optional[dict] = None
+    highLowVoltage: Optional[bool] = None
+    overCurrent: Optional[bool] = None
+    powerOutage: Optional[bool] = None
 
 class DeviceOut(DeviceCreate):
     id: uuid.UUID
