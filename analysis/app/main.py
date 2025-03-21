@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from models import Event, SessionLocal, EventCreate, EventOut, Limit, LimitOut, LimitCreate
-import uvicorn
+from models import Event, SessionLocal, EventCreate, EventOut, Limit, LimitOut, LimitCreate, EnergyDataInput
+import modules.process as process
+import uvicorn, datetime
 
 app = FastAPI()
 
@@ -54,7 +55,22 @@ def read_limits(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @app.post("/process/")
 def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
+    try:
+        highLowVoltage, overCurrent = process.energy_data(energy_data.volts, energy_data.amps)
+        db_event = Event(
+            logId=energy_data.id,
+            deviceId=energy_data.deviceId,
+            overCurrent=overCurrent,
+            highLowVoltage=highLowVoltage,
+            timestamp=datetime.utcnow()
+        )
 
+        db.add(db_event)
+        db.commit()
+        db.refresh(db_event)
+        return db_event
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing data: {str(e)}")
 
 @app.get("/")
 async def root():
