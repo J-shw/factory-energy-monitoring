@@ -24,7 +24,6 @@ jobs:
       matrix:
         image:
           - database-management-system
-          - web-socket-server
           - analysis-system
           - communication-system
           - device-management-system
@@ -33,8 +32,6 @@ jobs:
         include:
           - image: database-management-system
             context: ./database
-          - image: web-socket-server
-            context: ./web-socket
           - image: analysis-system
             context: ./analysis
           - image: communication-system
