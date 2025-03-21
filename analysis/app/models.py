@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, Boolean
+from sqlalchemy import create_engine, Column, Integer, Float, String, DateTime, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from pydantic import BaseModel
@@ -16,8 +16,17 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
+class Limit(Base):
+    __tablename__ = "limits"
+
+    id = Column(Integer, primary_key=True, index=True)
+    deviceId = Column(String)
+    overCurrentValue = Column(Float, nullable=True)
+    highVoltageValue = Column(Float, nullable=True)
+    lowVoltageValue = Column(Float, nullable=True)
+
 class Event(Base):
-    __tablename__ = "items"
+    __tablename__ = "events"
 
     id = Column(Integer, primary_key=True, index=True)
     logId = Column(Integer) # Needs to correspond to the log entry that was processed
@@ -29,6 +38,18 @@ class Event(Base):
     
 
 Base.metadata.create_all(bind=engine)
+
+class LimitCreate(BaseModel):
+    deviceId: str
+    overCurrentValue: Optional[float] = None
+    highVoltageValue: Optional[float] = None
+    lowVoltageValue: Optional[float] = None
+
+class LimitOut(LimitCreate):
+    id: int
+
+    class Config:
+        orm_mode = True
 
 class EventCreate(BaseModel):
     logId: int
