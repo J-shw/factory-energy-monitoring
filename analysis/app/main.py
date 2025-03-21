@@ -52,6 +52,10 @@ def read_limits(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = db.query(Limit).offset(skip).limit(limit).all()
     return items
 
+@app.post("/process/")
+def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
+
+
 @app.get("/")
 async def root():
     return {"message": "Analysis - System"}
