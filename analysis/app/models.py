@@ -66,7 +66,7 @@ class EventOut(EventCreate):
         orm_mode = True
 
 class EnergyDataInput(BaseModel):
-    logId: int
+    id: int
     deviceId: str
     volts: float
     amps: float
