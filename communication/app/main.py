@@ -23,25 +23,7 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
-    try:
-        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
-        logging.debug("mqtt_data emitted successfully")
-    except Exception as e:
-        logging.error(f"Error emitting mqtt_data: {e}")
-    # try: # Stream data for analysis
-    #     url = "http://analysis:9090/events/"
-    #     headers = {"Content-Type": "application/json"}
-
-    #     response = requests.post(url, data=msg.payload, headers=headers)
-    #     response.raise_for_status()  # Raise an exception for bad status codes (4xx or 5xx)
-
-    #     logging.info(f"Response Status Code: {response.status_code}")
-
-    # except requests.exceptions.RequestException as e:
-    #     logging.error(f"Error: {e}")
-    # except json.JSONDecodeError:
-    #     logging.error("Response is not valid JSON")
-    try:
+    try: # Store data
         db = SessionLocal()
         payload_str = msg.payload.decode('utf-8')
         payload_create = LogCreate(**json.loads(payload_str))
@@ -58,6 +40,35 @@ def on_message(client, userdata, msg):
         db.rollback()
     finally:
         db.close()
+
+    try:
+        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
+        logging.debug("mqtt_data emitted successfully")
+    except Exception as e:
+        logging.error(f"Error emitting mqtt_data: {e}")
+
+    try: # Stream data for analysis
+        url = "http://analysis:9090/process/"
+        headers = {"Content-Type": "application/json"}
+
+        log_data = {
+            "id": log_entry.id,
+            "deviceId": log_entry.deviceId,
+            "volts": log_entry.volts,
+            "amps": log_entry.amps,
+            "timestamp": log_entry.timestamp.isoformat()
+        }
+
+        response = requests.post(url, data=json.dumps(log_data), headers=headers)
+        response.raise_for_status()
+
+        logging.info(f"Response Status Code: {response.status_code}")
+
+    except json.JSONDecodeError:
+        logging.error("Response is not valid JSON")
+    except Exception as e:
+        logging.error(f"Error: {e}")
+    
 
 
 client_id = "communication_system"

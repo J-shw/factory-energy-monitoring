@@ -64,3 +64,10 @@ class EventOut(EventCreate):
 
     class Config:
         orm_mode = True
+
+class EnergyDataInput(BaseModel):
+    id: int
+    deviceId: str
+    volts: float
+    amps: float
+    timestamp: datetime.datetime
