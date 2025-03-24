@@ -1,4 +1,5 @@
 from opcua import Server, ua
+from datetime import datetime, timezone
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -11,13 +12,13 @@ objects = server.get_objects_node()
 
 energyDataObj = objects.add_object("ns=2;i=1", "energyData")
 
-idVar = energyDataObj.add_variable("ns=2;i=2", "device_id", ua.VariantType.String)
+idVar = energyDataObj.add_variable("ns=2;i=2", "device_id", "initial_id", varianttype=ua.VariantType.String)
 idVar.set_writable()
-ampsVar = energyDataObj.add_variable("ns=2;i=3", "amps", ua.VariantType.Float)
+ampsVar = energyDataObj.add_variable("ns=2;i=3", "amps", 0.0, varianttype=ua.VariantType.Float)
 ampsVar.set_writable()
-voltsVar = energyDataObj.add_variable("ns=2;i=4", "volts", ua.VariantType.Float)
+voltsVar = energyDataObj.add_variable("ns=2;i=4", "volts", 0.0, varianttype=ua.VariantType.Float)
 voltsVar.set_writable()
-timeVar = energyDataObj.add_variable("ns=2;i=5", "timestamp", ua.VariantType.DateTime)
+timeVar = energyDataObj.add_variable("ns=2;i=5", "timestamp",datetime.now(timezone.utc), varianttype=ua.VariantType.DateTime)
 timeVar.set_writable()
 
 server.start()
