@@ -51,18 +51,23 @@ def on_message(client, userdata, msg):
         url = "http://analysis:9090/process/"
         headers = {"Content-Type": "application/json"}
 
-        log_data = log_entry.__dict__.copy()
-        log_data.pop('_sa_instance_state', None)
+        log_data = {
+            "id": log_entry.id,
+            "deviceId": log_entry.deviceId,
+            "volts": log_entry.volts,
+            "amps": log_entry.amps,
+            "timestamp": log_entry.timestamp.isoformat()
+        }
 
         response = requests.post(url, data=json.dumps(log_data), headers=headers)
         response.raise_for_status()
 
         logging.info(f"Response Status Code: {response.status_code}")
 
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Error: {e}")
     except json.JSONDecodeError:
         logging.error("Response is not valid JSON")
+    except Exception as e:
+        logging.error(f"Error: {e}")
     
 
 
