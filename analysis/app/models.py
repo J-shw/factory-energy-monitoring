@@ -41,9 +41,9 @@ Base.metadata.create_all(bind=engine)
 
 class LimitCreate(BaseModel):
     deviceId: str
-    overCurrentValue: Optional[float] = None
-    highVoltageValue: Optional[float] = None
-    lowVoltageValue: Optional[float] = None
+    overCurrentValue: Optional[bool] = None
+    highVoltageValue: Optional[bool] = None
+    lowVoltageValue: Optional[bool] = None
 
 class LimitOut(LimitCreate):
     id: int
