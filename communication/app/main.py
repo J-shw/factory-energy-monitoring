@@ -51,7 +51,10 @@ def on_message(client, userdata, msg):
         url = "http://analysis:9090/process/"
         headers = {"Content-Type": "application/json"}
 
-        response = requests.post(url, data=log_entry.json(), headers=headers)
+        log_data = log_entry.__dict__.copy()
+        log_data.pop('_sa_instance_state', None)
+
+        response = requests.post(url, data=json.dumps(log_data), headers=headers)
         response.raise_for_status()
 
         logging.info(f"Response Status Code: {response.status_code}")
