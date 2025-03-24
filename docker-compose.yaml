@@ -11,13 +11,9 @@ services:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   opcua:
-    image: freeopcua/server:latest
+    build: ./opcua-server
     ports:
       - "4840:4840"
-    volumes:
-      - ./data/opcua:/data
-    environment:
-      - OPCUA_SERVER_NAME=MyOPCUAServer
   db:
     image: ghcr.io/j-shw/database-management-system:latest
     build: ./database
