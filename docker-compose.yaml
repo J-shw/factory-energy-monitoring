@@ -10,6 +10,14 @@ services:
     volumes:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+  opcua:
+    image: freeopcua/server:latest
+    ports:
+      - "4840:4840"
+    volumes:
+      - ./data/opcua:/data
+    environment:
+      - OPCUA_SERVER_NAME=MyOPCUAServer
   db:
     image: ghcr.io/j-shw/database-management-system:latest
     build: ./database
@@ -57,6 +65,8 @@ services:
     build: ./fake-data
     depends_on:
       - mosquitto
+      - opcua
       - devices
     environment:
       MQTT_BROKER_HOST: mosquitto
+      OPC_UA_SERVER_HOST: opcua
