@@ -62,7 +62,7 @@ def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
             deviceId=energy_data.deviceId,
             overCurrent=overCurrent,
             highLowVoltage=highLowVoltage,
-            timestamp=datetime.utcnow()
+            timestamp=datetime.datetime.utcnow()
         )
 
         db.add(db_event)
