@@ -2,7 +2,8 @@ from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 from models import Event, SessionLocal, EventCreate, EventOut, Limit, LimitOut, LimitCreate, EnergyDataInput
 import modules.process as process
-import uvicorn, datetime
+from datetime import datetime, timezone
+import uvicorn
 
 app = FastAPI()
 
@@ -63,7 +64,7 @@ def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
             deviceId=energy_data.deviceId,
             overCurrent=overCurrent,
             highLowVoltage=highLowVoltage,
-            timestamp=datetime.datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
 
         db.add(db_event)
