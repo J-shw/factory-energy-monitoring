@@ -56,7 +56,8 @@ def read_limits(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @app.post("/process/")
 def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
     try:
-        highLowVoltage, overCurrent = process.energy_data(energy_data.volts, energy_data.amps)
+        limit = db.query(Limit).filter(Limit.deviceId == energy_data.deviceId).first()
+        highLowVoltage, overCurrent = process.energy_data(energy_data.volts, energy_data.amps, limit)
         db_event = Event(
             logId=energy_data.id,
             deviceId=energy_data.deviceId,
