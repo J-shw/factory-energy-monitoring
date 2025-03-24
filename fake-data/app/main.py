@@ -25,15 +25,16 @@ def send_mqtt(topic, message):
 def send_opcua_values(values):
 
     try:
-        nodes = [opc_client.get_node(node_id) for node_id in opc_node_ids]
-        data_values = [ua.DataValue(ua.Variant(value, data_type)) for value, data_type in zip(values, opc_data_types)]
-
-        opc_client.write_values(nodes, data_values)
-
         logging.debug(f"Sending OPC | Values: {values} | Nodes: {opc_node_ids}")
 
+        for i, node_id in enumerate(opc_node_ids):
+          node = opc_client.get_node(node_id)
+   
+          dv = ua.DataValue(ua.Variant(values[i], opc_data_types[i]))
+          node.set_value(dv)
+
     except Exception as e:
-        print(f"Error writing to OPC UA: {e}")
+        logging.error(f"Error writing to OPC UA: {e}")
 
 attempts = 3
 timeout = 5
@@ -81,13 +82,15 @@ try:
     voltage_ten_percent=device["voltage"]*0.1
     
     sleep = random.uniform(0.1,1)
-    current_time = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    current_time = datetime.datetime.now(datetime.timezone.utc)
     amps = random.uniform(0,device['currentRatingAmps'])
     volts = random.uniform(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
 
+    logging.info(f'Selected protocol: {protocol}')
+
     if protocol == 'mqtt':
       send_mqtt("energy-data", json.dumps({
-        "timestamp": current_time,
+        "timestamp": current_time.isoformat(),
         "amps": round(amps,2),
         "volts": round(volts,2),
         "deviceId": device["id"]
