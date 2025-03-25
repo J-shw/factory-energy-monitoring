@@ -24,6 +24,7 @@ class Device(Base):
     dateCreated = Column(DateTime(timezone=True), default=func.now())
     name = Column(String)
     description = Column(String, nullable=True)
+    connectionType = Column(String)
     location = Column(String, nullable=True)
     voltage = Column(Float, nullable=True)
     currentRatingAmps = Column(Float, nullable=True)
@@ -37,12 +38,14 @@ Base.metadata.create_all(bind=engine)
 class DeviceCreate(BaseModel):
     name: str
     description: Optional[str] = None
+    connectionType: str
     location: Optional[str] = None
     voltage: Optional[float] = None
     currentRatingAmps: Optional[float] = None
     highLowVoltage: Optional[bool] = False
     overCurrent: Optional[bool] = False
     powerOutage: Optional[bool] = False
+    
 
 class DeviceOut(DeviceCreate):
     id: uuid.UUID
