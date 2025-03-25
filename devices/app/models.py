@@ -24,7 +24,7 @@ class Device(Base):
     dateCreated = Column(DateTime(timezone=True), default=func.now())
     name = Column(String)
     description = Column(String, nullable=True)
-    connectionType = Column(String)
+    connectionType = Column(String) # opc or mqtt
     location = Column(String, nullable=True)
     voltage = Column(Float, nullable=True)
     currentRatingAmps = Column(Float, nullable=True)
