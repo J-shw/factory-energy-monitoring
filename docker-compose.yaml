@@ -15,7 +15,7 @@ services:
     ports:
       - "4840:4840"
   db:
-    image: ghcr.io/j-shw/database-management-system:latest
+    image: ghcr.io/j-shw/database-server:latest
     build: ./database
     environment:
       POSTGRES_USER: postgres
