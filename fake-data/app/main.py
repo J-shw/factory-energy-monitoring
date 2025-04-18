@@ -88,7 +88,7 @@ try:
 
     logging.info(f'Selected protocol: {protocol}')
 
-    if protocol == 'mqtt':
+    if device['connectionType'] == 'mqtt':
       send_mqtt("energy-data", json.dumps({
         "timestamp": current_time.isoformat(),
         "amps": round(amps,2),
