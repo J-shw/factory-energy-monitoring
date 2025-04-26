@@ -56,9 +56,9 @@ services:
       MQTT_BROKER_HOST: mosquitto
       DATABASE_URL: "postgres:password@db"
 
-  device-emulator:
-    image: ghcr.io/j-shw/device-emulator:latest
-    build: ./device-emulator
+  iot-emulator:
+    image: ghcr.io/j-shw/iot-emulator:latest
+    build: ./iot-emulator
     depends_on:
       - mosquitto
       - opcua

@@ -40,8 +40,8 @@ jobs:
             context: ./device-management-system
           - image: front-end
             context: ./front-end
-          - image: device-emulator
-            context: ./device-emulator
+          - image: iot-emulator
+            context: ./iot-emulator
 
     steps:
       - name: Checkout repository
