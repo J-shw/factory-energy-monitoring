@@ -1,10 +1,28 @@
 function addDevice() {
     const name = document.getElementById('name').value;
-    const serial_number = document.getElementById('description').value;
+    const description = document.getElementById('description').value;
+
+    const connectionType = document.getElementById('connectionType').value;
+
+    const location = document.getElementById('location').value;
+
+    const voltageRating = document.getElementById('voltageRating').value;
+    const currentRating = document.getElementById('currentRating').value;
+
+    const highLowVoltage = document.getElementById('highLowVoltage').checked;
+    const overCurrent = document.getElementById('overCurrent').checked;
+    const powerOutage = document.getElementById('powerOutage').checked;
 
     const data = {
         name: name,
-        description: serial_number
+        description: description,
+        connectionType: connectionType,
+        location: location,
+        voltage: voltageRating,
+        currentRatingAmps: currentRating,
+        highLowVoltage: highLowVoltage,
+        overCurrent: overCurrent,
+        powerOutage: powerOutage
     };
 
     fetch('/add/device', {
