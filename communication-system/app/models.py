@@ -19,7 +19,7 @@ class Log(Base):
     __tablename__ = "logs"
 
     id = Column(Integer, primary_key=True, index=True)
-    deviceId = Column(String)
+    iotId = Column(String)
     timestamp = Column(DateTime)
     amps = Column(Float)
     volts = Column(Float)
@@ -27,7 +27,7 @@ class Log(Base):
 Base.metadata.create_all(bind=engine)
 
 class LogBase(BaseModel):
-    deviceId: str
+    iotId: str
     timestamp: datetime.datetime
     amps: float
     volts: float

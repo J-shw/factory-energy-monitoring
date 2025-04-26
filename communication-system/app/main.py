@@ -53,7 +53,7 @@ def on_message(client, userdata, msg):
 
         log_data = {
             "id": log_entry.id,
-            "deviceId": log_entry.deviceId,
+            "iotId": log_entry.iotId,
             "volts": log_entry.volts,
             "amps": log_entry.amps,
             "timestamp": log_entry.timestamp.isoformat()
