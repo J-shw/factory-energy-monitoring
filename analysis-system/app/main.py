@@ -3,9 +3,11 @@ from sqlalchemy.orm import Session
 from models import Event, SessionLocal, EventCreate, EventOut, EnergyDataInput
 import modules.process as process
 from datetime import datetime, timezone
-import uvicorn
+import uvicorn, logging, json, requests
 
 app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
 
 def get_db():
     db = SessionLocal()
@@ -37,11 +39,16 @@ def read_events(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 @app.post("/process/")
 def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
     try:
-        limit = db.query(Limit).filter(Limit.deviceId == energy_data.deviceId).first()
-        highLowVoltage, overCurrent = process.energy_data(energy_data.volts, energy_data.amps, limit)
+        url = "http://device-management-system:9002/get/entity/" + energy_data.deviceId
+        response = requests.get(url)
+        response.raise_for_status()
+
+        entity = response.json()
+
+        highLowVoltage, overCurrent = process.energy_data(energy_data.volts, energy_data.amps, entity)
         db_event = Event(
             logId=energy_data.id,
-            deviceId=energy_data.deviceId,
+            entityId=entity.entityId,
             overCurrent=overCurrent,
             highLowVoltage=highLowVoltage,
             timestamp=datetime.now(timezone.utc)
@@ -52,6 +59,7 @@ def process_data(energy_data: EnergyDataInput, db: Session = Depends(get_db)):
         db.refresh(db_event)
         return db_event
     except Exception as e:
+        logging.error(f"Failed to process data: {e}")
         raise HTTPException(status_code=500, detail=f"Error processing data: {str(e)}")
 
 @app.get("/")
