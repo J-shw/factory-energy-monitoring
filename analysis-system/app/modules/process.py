@@ -1,5 +1,5 @@
-def energy_data(volts: float, amps: float, limit) -> tuple[bool, bool]:
+def energy_data(volts: float, amps: float, entity : dict) -> tuple[bool, bool]:
 
-    highLowVoltage = volts > limit.highVoltageValue or volts < limit.lowVoltageValue
-    overCurrent = amps > limit.overCurrentValue
+    highLowVoltage = volts > entity.highVoltageValue or volts < entity.lowVoltageValue
+    overCurrent = amps > entity.overCurrentValue
     return highLowVoltage, overCurrent
