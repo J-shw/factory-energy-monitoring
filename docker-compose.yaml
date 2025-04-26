@@ -10,44 +10,44 @@ services:
     volumes:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-  opcua:
+  opcua-server:
     build: ./opcua-server
     ports:
       - "4840:4840"
-  db:
-    image: ghcr.io/j-shw/database-management-system:latest
-    build: ./database
+  database-server:
+    image: ghcr.io/j-shw/database-server:latest
+    build: ./database-server
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-  analysis:
+  analysis-system:
     image: ghcr.io/j-shw/analysis-system:latest
-    build: ./analysis
+    build: ./analysis-system
     ports:
       - "9090:9090"
     depends_on:
       - db
     environment:
       DATABASE_URL: "postgres:password@db"
-  devices:
+  device-management-system:
     image: ghcr.io/j-shw/device-management-system:latest
-    build: ./devices
+    build: ./device-management-system
     ports:
       - "9002:9002"
     depends_on:
       - db
     environment:
       DATABASE_URL: "postgres:password@db"
-  web:
-    image: ghcr.io/j-shw/web-ui:latest
-    build: ./web
+  front-end:
+    image: ghcr.io/j-shw/front-end:latest
+    build: ./front-end
     ports:
       - "8080:8080"
-  communication:
+  communication-system:
     image: ghcr.io/j-shw/communication-system:latest
-    build: ./communication
+    build: ./communication-system
     depends_on:
       - mosquitto
       - web
@@ -56,9 +56,9 @@ services:
       MQTT_BROKER_HOST: mosquitto
       DATABASE_URL: "postgres:password@db"
 
-  fake-data:
-    image: ghcr.io/j-shw/fake-data-system:latest
-    build: ./fake-data
+  iot-emulator:
+    image: ghcr.io/j-shw/iot-emulator:latest
+    build: ./iot-emulator
     depends_on:
       - mosquitto
       - opcua
