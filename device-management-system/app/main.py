@@ -58,7 +58,7 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 @app.get("/")
 async def root():
-    return {"message": "Devices - System"}
+    return {"message": "Device Managemnt System"}
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=9002)
