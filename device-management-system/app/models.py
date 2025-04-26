@@ -33,7 +33,8 @@ class Entity(Base):
     overCurrent = Column(Boolean, default=False)
     powerOutage = Column(Boolean, default=False)
     overCurrentValue = Column(Float, nullable=True)
-    overVoltageValue = Column(Float, nullable=True)
+    lowVoltageValue = Column(Float, nullable=True)
+    highVoltageValue = Column(Float, nullable=True)
 
     isActive = Column(Boolean, default=True)
 
@@ -65,7 +66,8 @@ class EntityCreate(BaseModel):
     overCurrent: Optional[bool] = False
     powerOutage: Optional[bool] = False
     overCurrentValue: Optional[float] = None
-    overVoltageValue: Optional[float] = None
+    lowVoltageValue: Optional[float] = None
+    highVoltageValue: Optional[float] = None
     
 
 class EntityOut(EntityCreate):
