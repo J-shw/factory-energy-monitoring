@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, PickleType, Boolean, String, Float, DateTime, UUID
+from sqlalchemy import create_engine, Column, PickleType, Boolean, String, Float, DateTime, UUID, Integer, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.sql import func
@@ -17,37 +17,74 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
 
-class Device(Base):
-    __tablename__ = "Devices"
+class Entity(Base):
+    __tablename__ = "Entity"
+
+    id = Column(Integer, primary_key=True, index=True)
+    dateCreated = Column(DateTime(timezone=True), default=func.now())
+    voltageIotId = Column(String, ForeignKey("Iot.id"))
+    currentIotId = Column(String, ForeignKey("Iot.id"))
+    name = Column(String)
+    description = Column(String, nullable=True)
+    location = Column(String, nullable=True)
+    voltageRating = Column(Float, nullable=True)
+    currentRating = Column(Float, nullable=True)
+    highLowVoltage = Column(Boolean, default=False)
+    overCurrent = Column(Boolean, default=False)
+    powerOutage = Column(Boolean, default=False)
+    overCurrentValue = Column(Float, nullable=True)
+    overVoltageValue = Column(Float, nullable=True)
+
+    isActive = Column(Boolean, default=True)
+
+class Iot(Base):
+    __tablename__ = "Iot"
 
     id = Column(UUID(as_uuid=True), primary_key=True, index=True, default=uuid.uuid4)
     dateCreated = Column(DateTime(timezone=True), default=func.now())
     name = Column(String)
     description = Column(String, nullable=True)
-    connectionType = Column(String) # opc or mqtt
     location = Column(String, nullable=True)
-    voltage = Column(Float, nullable=True)
-    currentRatingAmps = Column(Float, nullable=True)
+    protocol = Column(String) # opc or mqtt
+    voltage = Column(Boolean)
+    current = Column(Boolean)
+    
     isActive = Column(Boolean, default=True)
-    highLowVoltage = Column(Boolean, default=True)
-    overCurrent = Column(Boolean, default=True)
-    powerOutage = Column(Boolean, default=True)
 
 Base.metadata.create_all(bind=engine)
 
-class DeviceCreate(BaseModel):
+class EntityCreate(BaseModel):
+    voltageIotId: str
+    currentIotId: str
     name: str
     description: Optional[str] = None
-    connectionType: str
     location: Optional[str] = None
-    voltage: Optional[float] = None
-    currentRatingAmps: Optional[float] = None
+    voltageRating: Optional[float] = None
+    currentRating: Optional[float] = None
     highLowVoltage: Optional[bool] = False
     overCurrent: Optional[bool] = False
     powerOutage: Optional[bool] = False
+    overCurrentValue: Optional[float] = None
+    overVoltageValue: Optional[float] = None
     
 
-class DeviceOut(DeviceCreate):
+class EntityOut(EntityCreate):
+    id: int
+    dateCreated: datetime.datetime
+
+    class Config:
+        orm_mode = True
+
+class IotCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    location: Optional[str] = None
+    connectionType: str
+    protocol: str
+    voltage: bool
+    current: bool
+
+class IotOut(IotCreate):
     id: uuid.UUID
     dateCreated: datetime.datetime
 
