@@ -16,7 +16,7 @@ def get_db():
     finally:
         db.close()
 
-@app.post("create/event/", response_model=EventOut)
+@app.post("/create/event/", response_model=EventOut)
 def create_event(item: EventCreate, db: Session = Depends(get_db)):
     db_item = Event(**item.dict())
     db.add(db_item)
@@ -24,14 +24,14 @@ def create_event(item: EventCreate, db: Session = Depends(get_db)):
     db.refresh(db_item)
     return db_item
 
-@app.get("get/event/{event_id}", response_model=EventOut)
+@app.get("/get/event/{event_id}", response_model=EventOut)
 def read_event(event_id: int, db: Session = Depends(get_db)):
     db_item = db.query(Event).filter(Event.id == event_id).first()
     if db_item is None:
         raise HTTPException(status_code=404, detail="Event not found")
     return db_item
 
-@app.get("get/event/", response_model=list[EventOut])
+@app.get("/get/event/", response_model=list[EventOut])
 def read_events(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = db.query(Event).offset(skip).limit(limit).all()
     return items
