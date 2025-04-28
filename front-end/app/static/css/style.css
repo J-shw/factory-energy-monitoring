@@ -9,17 +9,22 @@
     --background: #ffffff;
     --foreground: whitesmoke;
     --text: #171717;
+    --input: white;
+    --buttonhover: #ddd;
     --highlight: #8be08e;
     --highlighthover: #75dd78;
 }
 
+
 @media (prefers-color-scheme: dark) {
     :root {
-        --background: #0a0a0a;
-        --foreground:  rgb(31,31,31);
-        --text: #ededed;
-        --highlight: #4CAF50;
-        --highlighthover: #41a645;
+        --background: #121212;
+        --foreground: #333333;
+        --text: whitesmoke;
+        --input: #222222;
+        --buttonhover: #444444;
+        --highlight: #8be08e;
+        --highlighthover: #75dd78;
     }
 }
 
