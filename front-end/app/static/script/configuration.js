@@ -59,7 +59,7 @@ function displayConfigForm(form) {
     formContent.innerHTML = '';
     selectContent.innerHTML = '';
 
-    const htmlToInsert = `
+    let htmlToInsert = `
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
     
@@ -108,6 +108,13 @@ function displayConfigForm(form) {
         <input type="number" id="voltageRating" name="voltageRating">
         <label for="currentRating">Current Rating (A):</label>
         <input type="number" id="currentRating" name="currentRating">
+
+        <label for="upperVoltageLimit">Upper Voltage Limit (V):</label>
+        <input type="number" id="upperVoltageLimit" name="upperVoltageLimit">
+        <label for="lowerVoltageLimit">Lower Voltage Limit (V):</label>
+        <input type="number" id="lowerVoltageLimit" name="lowerVoltageLimit">
+        <label for="upperCurrentLimit">Upper Current Limit (A):</label>
+        <input type="number" id="upperCurrentLimit" name="upperCurrentLimit">
     
         <label for="highLowVoltage">Monitor Voltage:</label>
         <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
