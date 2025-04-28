@@ -52,3 +52,73 @@ function addDevice() {
         }
     });
 }
+
+function displayConfigForm(form) {
+    formContent = document.getElementById('configForm');
+    selectContent = document.getElementById('selectConfig');
+    formContent.innerHTML = '';
+    selectContent.innerHTML = '';
+
+    const htmlToInsert = `
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+    
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description">
+    
+        <label for="location">Location:</label>
+        <input type="text" id="location" name="location">
+        `
+
+    if(form == 'iot'){
+        const newOption = document.createElement('option');
+        newOption.value = '';
+        newOption.textContent = 'New IoT';
+        selectContent.appendChild(newOption);
+
+        htmlToInsert += `
+        <label for="connectionType">Connection Type:</label>
+        <select id="connectionType" name="connectionType" required>
+            <option value="opc">OPC</option>
+            <option value="mqtt">MQTT</option>
+        </select>
+    
+        <label for="voltageRating">Voltage Rating (V):</label>
+        <input type="number" id="voltageRating" name="voltageRating">
+        <label for="currentRating">Current Rating (A):</label>
+        <input type="number" id="currentRating" name="currentRating">
+    
+        <label for="measureVoltage">Measures Voltage:</label>
+        <input type="checkbox" id="measureVoltage" name="measureVoltage">
+        <label for="measureCurrent">Measures Current:</label>
+        <input type="checkbox" id="measureCurrent" name="measureCurrent">
+    
+        <button type="button" onclick="addDevice()">Add IoT</button>
+      `;
+      formContent.innerHTML = htmlToInsert;
+    }
+    else if(form == 'entity'){
+        const newOption = document.createElement('option');
+        newOption.value = '';
+        newOption.textContent = 'New Entity';
+        selectContent.appendChild(newOption);
+
+        htmlToInsert += `    
+        <label for="voltageRating">Voltage Rating (V):</label>
+        <input type="number" id="voltageRating" name="voltageRating">
+        <label for="currentRating">Current Rating (A):</label>
+        <input type="number" id="currentRating" name="currentRating">
+    
+        <label for="highLowVoltage">Monitor Voltage:</label>
+        <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
+        <label for="overCurrent">Monitor Current:</label>
+        <input type="checkbox" id="overCurrent" name="overCurrent">
+        <label for="powerOutage">Monitor Power:</label>
+        <input type="checkbox" id="powerOutage" name="powerOutage">
+    
+        <button type="button" onclick="addDevice()">Add Entity</button>
+      `;
+      formContent.innerHTML = htmlToInsert;
+
+    }
+}
