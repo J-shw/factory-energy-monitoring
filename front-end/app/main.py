@@ -12,9 +12,13 @@ socketio = SocketIO(app)
 def index_page():
     return render_template('index.html')
 
-@app.route('/device')
-def device_page():
+@app.route('/configuration')
+def configuration_page():
     return render_template('device.html')
+
+@app.route('/events')
+def events_page():
+    return render_template('events.html')
 
 @app.route('/devices/<UID>')
 def device(UID):
