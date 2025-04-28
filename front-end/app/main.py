@@ -14,7 +14,7 @@ def index_page():
 
 @app.route('/configuration')
 def configuration_page():
-    return render_template('device.html')
+    return render_template('configuration.html')
 
 @app.route('/events')
 def events_page():
