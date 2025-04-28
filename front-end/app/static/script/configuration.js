@@ -129,3 +129,5 @@ function displayConfigForm(form) {
 
     }
 }
+
+displayConfigForm('iot');
