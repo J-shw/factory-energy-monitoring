@@ -16,16 +16,19 @@ label {
     margin-bottom: 5px;
 }
 
+select,
 input{
     background-color: var(--input);
-}
-input[type="text"] {
-    width: 100%;
     padding: 8px;
     margin-bottom: 10px;
     /* border: 1px solid #ccc; */
+    border: none;
     border-radius: 3px;
     box-sizing: border-box;
+    color: var(--text);
+}
+input[type="text"] {
+    width: 100%;
 }
 
 button {
@@ -59,17 +62,21 @@ button:hover {
     gap: 20px;
     padding: 10px;
     border-radius: 5px;
-    width: 40%;
+    width: fit-content;
     margin: auto;
+    background-color: var(--foreground);
 }
-
 .config-option a {
     text-decoration: none;
-    color: #333;
+    color: var(--text);
     padding: 8px 12px;
     border-radius: 3px;
 }
-
 .config-option a:hover {
+    cursor: pointer;
     background-color: var(--buttonhover);
+}
+
+#selectConfig {
+    margin: auto;
 }
