@@ -91,10 +91,10 @@ def connect():
 def disconnect():
     logging.info(f'Client disconnected')
 
-@socketio.on('mqtt_data')
+@socketio.on('iot_data')
 def handle_mqtt_data(data):
-    logging.debug(f'Received MQTT message: {data}')
-    emit('mqtt_message', {'topic': data['topic'], 'payload': data['payload'].decode('utf-8')}, broadcast=True)
+    logging.debug(f'Received IoT message: {data}')
+    emit('iot_message', {'topic': data['topic'], 'payload': data['payload'].decode('utf-8')}, broadcast=True)
 
 if __name__ == "__main__":
     logging.info("Starting web systems")
