@@ -81,7 +81,6 @@ class IotCreate(BaseModel):
     name: str
     description: Optional[str] = None
     location: Optional[str] = None
-    connectionType: str
     protocol: str
     voltage: bool
     current: bool
