@@ -1,12 +1,16 @@
 <nav>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/nav.css') }}">
-    <div class="nav-option">
+
+    <a href="/" class="nav-option">
         Live Data
-    </div>
-    <div class="nav-option">
-       Events
-    </div>
-    <div class="nav-option">
+    </a>
+
+    <a href="/events" class="nav-option">
+        Events
+    </a>
+    
+    <a href="/configuration" class="nav-option">
         Configuration
-    </div>
+    </a>
+ 
 </nav>
