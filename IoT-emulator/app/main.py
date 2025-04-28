@@ -38,21 +38,25 @@ def send_opcua_values(values):
 
 attempts = 3
 timeout = 5
-devices = None
-devices_loaded = False
+
+iots = None
+iots_loaded = False
+
+entities = None
+entities_loaded = False
 
 for attempt in range(attempts):
-  if not devices_loaded:
-    logging.info(f'Attempting to load devices | Attempt {attempt+1}/{attempts}')
+  if not iots_loaded:
+    logging.info(f'Attempting to load IoTs | Attempt {attempt+1}/{attempts}')
     try:
       url = "http://device-management-system:9002/get/iot"
 
       response = requests.get(url)
       response.raise_for_status()
-      devices = response.json()
+      iots = response.json()
 
       logging.info(f"Devices loaded")
-      devices_loaded = True
+      iots_loaded = True
 
     except requests.exceptions.RequestException as e:
       logging.error(f"Error: {e}")
@@ -63,36 +67,58 @@ for attempt in range(attempts):
   else:
     break
 
-if devices is None or len(devices) == 0:
-  logging.critical("No devices returned")
+for attempt in range(attempts):
+  if not entities_loaded:
+    logging.info(f'Attempting to load Entities | Attempt {attempt+1}/{attempts}')
+    try:
+      url = "http://device-management-system:9002/get/entity"
+
+      response = requests.get(url)
+      response.raise_for_status()
+      entities = response.json()
+
+      logging.info(f"Devices loaded")
+      entities_loaded = True
+
+    except requests.exceptions.RequestException as e:
+      logging.error(f"Error: {e}")
+      time.sleep(timeout)
+    except json.JSONDecodeError:
+      logging.error("Response is not valid JSON")
+      time.sleep(timeout)
+  else:
+    break
+
+if (iots is None or len(iots) == 0) & (entities is None or len(entities) == 0):
+  logging.critical("No Iots or Entities were returned")
   mqtt_client.disconnect()
   opc_client.disconnect()
   sys.exit(1)
 
-num_devices = len(devices)
-logging.info(f"Number of devices: {num_devices}")
+num_iots = len(iots)
+logging.info(f"Number of iots: {num_iots}")
 
 try:
   while True:
 
-    device = random.choice(devices)
+    iot = random.choice(iots)
 
-    voltage_ten_percent=device["voltage"]*0.1
+    voltage_ten_percent=iot["voltage"]*0.1
     
     sleep = random.uniform(0.1,1)
     current_time = datetime.datetime.now(datetime.timezone.utc)
-    amps = random.uniform(0,device['currentRatingAmps'])
-    volts = random.uniform(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
+    amps = random.uniform(0,iot['currentRatingAmps'])
+    volts = random.uniform(iot["voltage"]-voltage_ten_percent,iot["voltage"]+voltage_ten_percent)
 
-    if device['connectionType'] == 'mqtt':
-      send_mqtt(f"{device["id"]}-energy-data", json.dumps({
+    if iot['connectionType'] == 'mqtt':
+      send_mqtt(f"{iot["id"]}-energy-data", json.dumps({
         "timestamp": current_time.isoformat(),
         "amps": round(amps,2),
         "volts": round(volts,2),
-        "deviceId": device["id"]
+        "deviceId": iot["id"]
       }))
-    elif device['connectionType'] == 'opc':
-      send_opcua_values([device["id"], round(amps,2), round(volts,2), current_time])
+    elif iot['connectionType'] == 'opc':
+      send_opcua_values([iot["id"], round(amps,2), round(volts,2), current_time])
       
     time.sleep(sleep)
 except KeyboardInterrupt:
