@@ -1,13 +1,13 @@
 import paho.mqtt.client as mqtt
 from opcua import Client, ua
-import logging, time, os, datetime, random, json, requests
+import logging, time, os, datetime, random, json, requests, sys
 
 logging.basicConfig(level=logging.DEBUG)
 
 mqtt_host = os.environ.get("MQTT_BROKER_HOST")
 opc_host = os.environ.get("OPC_UA_SERVER_HOST")
 
-client_id = "fake_data_system"
+client_id = "IoT_emulator"
 
 mqtt_client = mqtt.Client(client_id=client_id)
 mqtt_client.connect(mqtt_host, 1883, 60)
@@ -65,17 +65,13 @@ for attempt in range(attempts):
 
 if devices is None or len(devices) == 0:
   logging.warning("No devices returned")
-  devices = [{"name":"Fake Device","description":"Fake Sensor due to no devices being registered","id":"fake-id-here","dateCreated":"2025-03-18T12:18:03.884939Z"}]
-
+  sys.exit(1)
 
 num_devices = len(devices)
 logging.info(f"Number of devices: {num_devices}")
 
-send_protocols = ['mqtt', 'opc']
-
 try:
   while True:
-    protocol = random.choice(send_protocols)
 
     device = random.choice(devices)
 
@@ -86,16 +82,14 @@ try:
     amps = random.uniform(0,device['currentRatingAmps'])
     volts = random.uniform(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
 
-    logging.info(f'Selected protocol: {protocol}')
-
     if device['connectionType'] == 'mqtt':
-      send_mqtt("energy-data", json.dumps({
+      send_mqtt(f"{device["id"]}-energy-data", json.dumps({
         "timestamp": current_time.isoformat(),
         "amps": round(amps,2),
         "volts": round(volts,2),
         "deviceId": device["id"]
       }))
-    elif protocol == 'opc':
+    elif device['connectionType'] == 'opc':
       send_opcua_values([device["id"], round(amps,2), round(volts,2), current_time])
       
     time.sleep(sleep)
