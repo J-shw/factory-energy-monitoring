@@ -55,6 +55,23 @@ def add_device():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
+@app.route('/get/events', methods=['GET'])
+def get_events():
+    try:
+        logging.info("Getting events")
+
+        response = requests.get("http://analysis-system:9002/get/event")
+
+        if response.status_code == 201: 
+            return jsonify(response.json()), 201
+        else:
+            return jsonify({"error": response.json()}), response.status_code
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Error communicating with Analysis System API: {e}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
+
 @socketio.on('connect')
 def connect():
     logging.info(f'Client connected')
