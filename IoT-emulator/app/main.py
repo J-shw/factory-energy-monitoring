@@ -45,7 +45,7 @@ for attempt in range(attempts):
   if not devices_loaded:
     logging.info(f'Attempting to load devices | Attempt {attempt+1}/{attempts}')
     try:
-      url = "http://devices:9002/devices/"
+      url = "http://devices:9002/device-management-system/get/iot"
 
       response = requests.get(url)
       response.raise_for_status()
@@ -64,7 +64,9 @@ for attempt in range(attempts):
     break
 
 if devices is None or len(devices) == 0:
-  logging.warning("No devices returned")
+  logging.critical("No devices returned")
+  mqtt_client.disconnect()
+  opc_client.disconnect()
   sys.exit(1)
 
 num_devices = len(devices)
