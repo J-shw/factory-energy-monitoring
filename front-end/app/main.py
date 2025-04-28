@@ -10,7 +10,7 @@ socketio = SocketIO(app)
 
 @app.route('/')
 def index_page():
-    return render_template('index.html')
+    return render_template('live.html')
 
 @app.route('/configuration')
 def configuration_page():
@@ -20,10 +20,21 @@ def configuration_page():
 def events_page():
     return render_template('events.html')
 
-@app.route('/devices/<UID>')
+@app.route('/get/iot', methods=['GET'])
+def get_iot():
+    try:
+        data = requests.get(f'http://device-management-system:9002/get/iot')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
+@app.route('/get/device/<UID>', methods=['GET'])
 def device(UID):
     try:
-        data = requests.get(f'http://devices:9002/devices/{UID}')
+        data = requests.get(f'http://device-management-system:9002/devices/{UID}')
         data.raise_for_status()
         return jsonify(data.json()), 200
     except requests.exceptions.RequestException as e:
