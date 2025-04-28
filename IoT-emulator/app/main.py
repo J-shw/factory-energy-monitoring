@@ -45,7 +45,7 @@ for attempt in range(attempts):
   if not devices_loaded:
     logging.info(f'Attempting to load devices | Attempt {attempt+1}/{attempts}')
     try:
-      url = "http://devices:9002/device-management-system/get/iot"
+      url = "http://device-management-system:9002/get/iot"
 
       response = requests.get(url)
       response.raise_for_status()
