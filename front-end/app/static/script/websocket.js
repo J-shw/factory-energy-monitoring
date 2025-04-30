@@ -9,11 +9,11 @@ socket.on('disconnect', function() {
 
 
 socket.on('iot_message', function(data) {
-    console.log('Received message: ')
+    console.log('Received message:')
     console.log(data)
 
      try {
-        const payload = data.payload;
+        const payload = JSON.parse(data.payload);
         updateIotCharts(payload);
     } catch (error) {
         console.error('Error parsing payload:', error);
