@@ -7,3 +7,14 @@
     margin: 20px auto; 
     box-sizing: border-box;
 }
+
+.no-iot {
+    padding: 15px;
+    text-align: center;
+    background-color: var(--foreground);
+    color: var(--text);
+    border-radius: 5px;
+    font-size: x-large;
+    width: 350px;
+    margin: auto;
+}

@@ -25,6 +25,15 @@ fetch('/get/iot')
 iotSelect.addEventListener('change', (event) => {
     const iotId = event.target.value;
     currentIoTId = iotId;
-    console.log('New iot selected. ID - ', iotId);
-    createIotChart(iotId)
+    if (currentIoTId == 'empty'){
+        document.getElementById('iot-charts').innerHTML = `
+        <div class="no-iot">
+            No IoT selected
+        </div>
+        `
+    }
+    else{
+        console.log('New iot selected with ID - ', iotId);
+        createIotChart(iotId)
+    }
   });

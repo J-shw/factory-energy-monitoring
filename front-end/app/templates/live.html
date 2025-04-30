@@ -13,8 +13,11 @@
 {% endblock %}
 {% block content %}
 <select id="iot-select">
-    <option>Select IoT</option>
+    <option value="empty">Select IoT</option>
 </select>
 <div id="iot-charts">
+    <div class="no-iot">
+        No IoT selected
+    </div>
 </div>
 {% endblock %}
