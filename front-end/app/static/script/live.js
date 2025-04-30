@@ -24,6 +24,7 @@ fetch('/get/iot')
 
 iotSelect.addEventListener('change', (event) => {
     const iotId = event.target.value;
+    currentIoTId = iotId;
     console.log('New iot selected. ID - ', iotId);
-    
+    createIotChart(iotId)
   });
