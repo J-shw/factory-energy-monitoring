@@ -23,7 +23,18 @@ def events_page():
 @app.route('/get/iot', methods=['GET'])
 def get_iot():
     try:
-        data = requests.get(f'http://device-management-system:9002/get/iot')
+        data = requests.get('http://device-management-system:9002/get/iot')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
+@app.route('/get/iot/<uid>', methods=['GET'])
+def get_specific_iot(uid):
+    try:
+        data = requests.get(f'http://device-management-system:9002/get/iot/{uid}')
         data.raise_for_status()
         return jsonify(data.json()), 200
     except requests.exceptions.RequestException as e:
