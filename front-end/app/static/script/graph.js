@@ -47,12 +47,12 @@ function createIotChart(iotId) {
 }
 
 function updateIotCharts(payload) {
-    const iotId = payload.iotId;
+    const iotId = payload['iotId'];
     const iotSelect = document.getElementById('iot-select');
 
     console.log(iotId)
     if (iotSelect.value == iotId) {
-        const { ampsChart, voltsChart } = deviceCharts[deviceId];
+        const { ampsChart, voltsChart } = deviceCharts[iotId];
 
         ampsChart.data.labels.push(payload.timestamp);
         ampsChart.data.datasets[0].data.push(payload.amps);
