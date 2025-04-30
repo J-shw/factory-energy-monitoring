@@ -23,11 +23,11 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
+    msgPayload = msg.payload.decode('utf-8')
 
     try: # Store data
         db = SessionLocal()
-        payload_str = msg.payload.decode('utf-8')
-        payload_create = LogCreate(**json.loads(payload_str))
+        payload_create = LogCreate(**json.loads(msgPayload))
         log_entry = Log(**payload_create.dict())
 
         db.add(log_entry)
@@ -43,10 +43,10 @@ def on_message(client, userdata, msg):
         db.close()
 
     try: # Emit data to SocketIO
-        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
-        logging.debug("mqtt_data emitted successfully")
+        sio.emit('iot_data', {'iotId': log_entry.iotId, 'payload': msgPayload, 'source': {'protocol': 'mqtt' ,'topic': msg.topic}})
+        logging.debug("iot_data emitted successfully")
     except Exception as e:
-        logging.error(f"Error emitting mqtt_data: {e}")
+        logging.error(f"Error emitting iot_data: {e}")
 
     try: # Stream data for analysis
         url = "http://analysis-system:9090/process/"
