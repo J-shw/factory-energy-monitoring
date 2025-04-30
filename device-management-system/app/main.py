@@ -37,7 +37,7 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 # IoT APIs - - -
 
 @app.post("/create/iot/", response_model=IotOut)
-def create_device(iot: EntityCreate, db: Session = Depends(get_db)):
+def create_device(iot: IotCreate, db: Session = Depends(get_db)):
     db_item = Iot(**iot.dict())
     db.add(db_item)
     db.commit()

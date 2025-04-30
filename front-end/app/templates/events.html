@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}Events{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/events.css') }}">
+<script src="{{ url_for('static', filename='script/events.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<table>
+    <thead>
+        <tr>
+            <th>Time</th>
+            <th>Event</th>
+            <th>Device</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody id="eventsTableBody">
+    </tbody>
+</table>
+{% endblock %}

@@ -6,7 +6,6 @@ h1 {
 form {
     width: 300px;
     margin: 0 auto;
-    border: 1px solid #ccc;
     padding: 20px;
     border-radius: 5px;
 }
@@ -16,18 +15,23 @@ label {
     margin-bottom: 5px;
 }
 
-input[type="text"] {
-    width: 100%;
+select,
+input{
+    background-color: var(--input);
     padding: 8px;
     margin-bottom: 10px;
-    border: 1px solid #ccc;
+    border: none;
     border-radius: 3px;
     box-sizing: border-box;
+    color: var(--text);
+    cursor: pointer;
+}
+input[type="text"] {
+    width: 100%;
 }
 
 button {
     background-color: var(--highlight);
-    color: white;
     padding: 10px 15px;
     border: none;
     border-radius: 3px;
@@ -50,4 +54,29 @@ button:hover {
 
 .response-error{
     color: red;
+}
+
+.config-option {
+    display: flex;
+    gap: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    width: fit-content;
+    margin: auto;
+    background-color: var(--foreground);
+    margin-top: 25px;
+}
+.config-option a {
+    text-decoration: none;
+    color: var(--text);
+    padding: 8px 12px;
+    border-radius: 3px;
+}
+.config-option a:hover {
+    cursor: pointer;
+    background-color: var(--buttonhover);
+}
+
+#selectConfig {
+    margin: auto;
 }

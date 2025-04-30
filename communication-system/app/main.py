@@ -11,7 +11,7 @@ sio = socketio.Client()
 
 logging.debug("Attempting to connect to SocketIO server")
 try:
-    sio.connect('http://web:8080', transports=['websocket'])
+    sio.connect('http://front-end:8080', transports=['websocket'])
     logging.info("Connected to SocketIO server successfully")
 except Exception as e:
     logging.error(f"Error connecting to SocketIO server: {e}")
@@ -19,14 +19,15 @@ except Exception as e:
 # MQTT
 def on_connect(client, userdata, flags, rc):
     logging.info("MQTT connected with result code "+str(rc))
-    client.subscribe("energy-data")
+    client.subscribe("energy-data/+")
 
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
+    msgPayload = msg.payload.decode('utf-8')
+
     try: # Store data
         db = SessionLocal()
-        payload_str = msg.payload.decode('utf-8')
-        payload_create = LogCreate(**json.loads(payload_str))
+        payload_create = LogCreate(**json.loads(msgPayload))
         log_entry = Log(**payload_create.dict())
 
         db.add(log_entry)
@@ -41,14 +42,14 @@ def on_message(client, userdata, msg):
     finally:
         db.close()
 
-    try:
-        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
-        logging.debug("mqtt_data emitted successfully")
+    try: # Emit data to SocketIO
+        sio.emit('iot_data', {'iotId': log_entry.iotId, 'payload': msgPayload, 'source': {'protocol': 'mqtt' ,'topic': msg.topic}})
+        logging.debug("iot_data emitted successfully")
     except Exception as e:
-        logging.error(f"Error emitting mqtt_data: {e}")
+        logging.error(f"Error emitting iot_data: {e}")
 
     try: # Stream data for analysis
-        url = "http://analysis:9090/process/"
+        url = "http://analysis-system:9090/process/"
         headers = {"Content-Type": "application/json"}
 
         log_data = {
@@ -68,7 +69,6 @@ def on_message(client, userdata, msg):
         logging.error("Response is not valid JSON")
     except Exception as e:
         logging.error(f"Error: {e}")
-    
 
 
 client_id = "communication_system"

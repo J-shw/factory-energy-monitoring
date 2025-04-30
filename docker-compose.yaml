@@ -28,18 +28,18 @@ services:
     ports:
       - "9090:9090"
     depends_on:
-      - db
+      - database-server
     environment:
-      DATABASE_URL: "postgres:password@db"
+      DATABASE_URL: "postgres:password@database-server"
   device-management-system:
     image: ghcr.io/j-shw/device-management-system:latest
     build: ./device-management-system
     ports:
       - "9002:9002"
     depends_on:
-      - db
+      - database-server
     environment:
-      DATABASE_URL: "postgres:password@db"
+      DATABASE_URL: "postgres:password@database-server"
   front-end:
     image: ghcr.io/j-shw/front-end:latest
     build: ./front-end
@@ -50,19 +50,19 @@ services:
     build: ./communication-system
     depends_on:
       - mosquitto
-      - web
-      - analysis
+      - front-end
+      - analysis-system
     environment:
       MQTT_BROKER_HOST: mosquitto
-      DATABASE_URL: "postgres:password@db"
+      DATABASE_URL: "postgres:password@database-server"
 
   iot-emulator:
     image: ghcr.io/j-shw/iot-emulator:latest
     build: ./iot-emulator
     depends_on:
       - mosquitto
-      - opcua
-      - devices
+      - opcua-server
+      - device-management-system
     environment:
       MQTT_BROKER_HOST: mosquitto
-      OPC_UA_SERVER_HOST: opcua
+      OPC_UA_SERVER_HOST: opcua-server

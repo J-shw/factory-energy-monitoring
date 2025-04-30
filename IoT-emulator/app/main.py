@@ -1,13 +1,13 @@
 import paho.mqtt.client as mqtt
 from opcua import Client, ua
-import logging, time, os, datetime, random, json, requests
+import logging, time, os, datetime, random, json, requests, sys
 
 logging.basicConfig(level=logging.DEBUG)
 
 mqtt_host = os.environ.get("MQTT_BROKER_HOST")
 opc_host = os.environ.get("OPC_UA_SERVER_HOST")
 
-client_id = "fake_data_system"
+client_id = "IoT_emulator"
 
 mqtt_client = mqtt.Client(client_id=client_id)
 mqtt_client.connect(mqtt_host, 1883, 60)
@@ -38,21 +38,25 @@ def send_opcua_values(values):
 
 attempts = 3
 timeout = 5
-devices = None
-devices_loaded = False
+
+iots = None
+iots_loaded = False
+
+entities = None
+entities_loaded = False
 
 for attempt in range(attempts):
-  if not devices_loaded:
-    logging.info(f'Attempting to load devices | Attempt {attempt+1}/{attempts}')
+  if not iots_loaded:
+    logging.info(f'Attempting to load IoTs | Attempt {attempt+1}/{attempts}')
     try:
-      url = "http://devices:9002/devices/"
+      url = "http://device-management-system:9002/get/iot"
 
       response = requests.get(url)
       response.raise_for_status()
-      devices = response.json()
+      iots = response.json()
 
       logging.info(f"Devices loaded")
-      devices_loaded = True
+      iots_loaded = True
 
     except requests.exceptions.RequestException as e:
       logging.error(f"Error: {e}")
@@ -63,43 +67,104 @@ for attempt in range(attempts):
   else:
     break
 
-if devices is None or len(devices) == 0:
-  logging.warning("No devices returned")
-  devices = [{"name":"Fake Device","description":"Fake Sensor due to no devices being registered","id":"fake-id-here","dateCreated":"2025-03-18T12:18:03.884939Z"}]
+for attempt in range(attempts):
+  if not entities_loaded:
+    logging.info(f'Attempting to load Entities | Attempt {attempt+1}/{attempts}')
+    try:
+      url = "http://device-management-system:9002/get/entity"
 
+      response = requests.get(url)
+      response.raise_for_status()
+      entities = response.json()
 
-num_devices = len(devices)
-logging.info(f"Number of devices: {num_devices}")
+      logging.info(f"Devices loaded")
+      entities_loaded = True
 
-send_protocols = ['mqtt', 'opc']
+    except requests.exceptions.RequestException as e:
+      logging.error(f"Error: {e}")
+      time.sleep(timeout)
+    except json.JSONDecodeError:
+      logging.error("Response is not valid JSON")
+      time.sleep(timeout)
+  else:
+    break
+
+if (iots is None or len(iots) == 0) & (entities is None or len(entities) == 0):
+  logging.critical("No Iots or Entities were returned")
+  mqtt_client.disconnect()
+  opc_client.disconnect()
+  sys.exit(1)
+
+num_iots = len(iots)
+logging.info(f"Number of iots: {num_iots}")
+logging.info(f"Number of entities: {len(entities)}")
 
 try:
   while True:
-    protocol = random.choice(send_protocols)
+    entity = random.choice(entities)
 
-    device = random.choice(devices)
+    voltage_iot = None
+    current_iot = None
+    single_iot = False
 
-    voltage_ten_percent=device["voltage"]*0.1
+    if entity['voltageIotId'] == entity['currentIotId']:
+      single_iot = True
+      for iot in iots:
+        if iot['id'] == entity['voltageIotId']:
+            iot_single = iot
+    else:
+      for iot in iots:
+        if iot['id'] == entity['voltageIotId']:
+            voltage_iot = iot
+        if iot['id'] == entity['currentIotId']:
+            current_iot = iot
+
+
+    voltage_ten_percent=entity["voltageRating"]*0.1
     
     sleep = random.uniform(0.1,1)
     current_time = datetime.datetime.now(datetime.timezone.utc)
-    amps = random.uniform(0,device['currentRatingAmps'])
-    volts = random.uniform(device["voltage"]-voltage_ten_percent,device["voltage"]+voltage_ten_percent)
+    amps = random.uniform(0,entity['currentRating'])
+    volts = random.uniform(entity["voltageRating"]-voltage_ten_percent,entity["voltageRating"]+voltage_ten_percent)
 
-    logging.info(f'Selected protocol: {protocol}')
-
-    if device['connectionType'] == 'mqtt':
-      send_mqtt("energy-data", json.dumps({
-        "timestamp": current_time.isoformat(),
-        "amps": round(amps,2),
-        "volts": round(volts,2),
-        "deviceId": device["id"]
-      }))
-    elif protocol == 'opc':
-      send_opcua_values([device["id"], round(amps,2), round(volts,2), current_time])
+    if single_iot:
+      if iot_single['protocol'] == 'mqtt':
+        send_mqtt(f"energy-data/{iot_single["id"]}", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "volts": round(volts,2),
+          "amps": round(amps,2),
+          "iotId": iot_single["id"]
+        }))
+      elif iot_single['protocol'] == 'opc':
+        send_opcua_values([iot_single["id"], round(amps,2), round(volts,2), current_time])
+    else:
+      # Voltage IoT
+      if voltage_iot['protocol'] == 'mqtt':
+        send_mqtt(f"{voltage_iot["id"]}-energy-data", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "volts": round(volts,2),
+          "iotId": voltage_iot["id"]
+        }))
+      elif voltage_iot['protocol'] == 'opc':
+        send_opcua_values([voltage_iot["id"], round(amps,2), round(volts,2), current_time])
       
+      # Current IoT
+      if current_iot['protocol'] == 'mqtt':
+        send_mqtt(f"{current_iot["id"]}-energy-data", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "amps": round(amps,2),
+          "iotId": current_iot["id"]
+        }))
+      elif current_iot['protocol'] == 'opc':
+        send_opcua_values([current_iot["id"], round(amps,2), round(volts,2), current_time])
+        
+        
     time.sleep(sleep)
+except Exception as e:
+  logging.error(f"Error: {e}")
 except KeyboardInterrupt:
   logging.info("Server stopped.")
 finally:
   mqtt_client.disconnect()
+  opc_client.disconnect()
+  sys.exit()

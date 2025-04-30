@@ -10,16 +10,42 @@ socketio = SocketIO(app)
 
 @app.route('/')
 def index_page():
-    return render_template('index.html')
+    return render_template('live.html')
 
-@app.route('/device')
-def device_page():
-    return render_template('device.html')
+@app.route('/configuration')
+def configuration_page():
+    return render_template('configuration.html')
 
-@app.route('/devices/<UID>')
+@app.route('/events')
+def events_page():
+    return render_template('events.html')
+
+@app.route('/get/iot', methods=['GET'])
+def get_iot():
+    try:
+        data = requests.get('http://device-management-system:9002/get/iot')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
+@app.route('/get/iot/<uid>', methods=['GET'])
+def get_specific_iot(uid):
+    try:
+        data = requests.get(f'http://device-management-system:9002/get/iot/{uid}')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
+@app.route('/get/device/<UID>', methods=['GET'])
 def device(UID):
     try:
-        data = requests.get(f'http://devices:9002/devices/{UID}')
+        data = requests.get(f'http://device-management-system:9002/devices/{UID}')
         data.raise_for_status()
         return jsonify(data.json()), 200
     except requests.exceptions.RequestException as e:
@@ -51,6 +77,23 @@ def add_device():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
+@app.route('/get/events', methods=['GET'])
+def get_events():
+    try:
+        logging.info("Getting events")
+
+        response = requests.get("http://analysis-system:9002/get/event")
+
+        if response.status_code == 201: 
+            return jsonify(response.json()), 201
+        else:
+            return jsonify({"error": response.json()}), response.status_code
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Error communicating with Analysis System API: {e}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
+
 @socketio.on('connect')
 def connect():
     logging.info(f'Client connected')
@@ -59,10 +102,10 @@ def connect():
 def disconnect():
     logging.info(f'Client disconnected')
 
-@socketio.on('mqtt_data')
-def handle_mqtt_data(data):
-    logging.debug(f'Received MQTT message: {data}')
-    emit('mqtt_message', {'topic': data['topic'], 'payload': data['payload'].decode('utf-8')}, broadcast=True)
+@socketio.on('iot_data')
+def handle_iot_data(data):
+    logging.debug(f'Received IoT message: {data}')
+    emit('iot_message', data, broadcast=True)
 
 if __name__ == "__main__":
     logging.info("Starting web systems")

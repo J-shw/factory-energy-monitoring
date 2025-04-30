@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block title %}Configuration{% endblock %}
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/configuration.css') }}">
+<script src="{{ url_for('static', filename='script/configuration.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<div class="config-option">
+    <a onclick="displayConfigForm('iot')">
+        IoT
+    </a>
+    <a onclick="displayConfigForm('entity')">
+        Entity
+    </a>
+</div>
+
+<div>
+    <select id="selectConfig">
+    </select>
+    <form id="configForm">
+    </form>
+    <div id="response"></div>
+</div>
+{% endblock %}

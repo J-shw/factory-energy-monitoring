@@ -22,8 +22,8 @@ class Entity(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     dateCreated = Column(DateTime(timezone=True), default=func.now())
-    voltageIotId = Column(String, ForeignKey("Iot.id"))
-    currentIotId = Column(String, ForeignKey("Iot.id"))
+    voltageIotId = Column(UUID(as_uuid=True), ForeignKey("Iot.id"))
+    currentIotId = Column(UUID(as_uuid=True), ForeignKey("Iot.id"))
     name = Column(String)
     description = Column(String, nullable=True)
     location = Column(String, nullable=True)
@@ -55,8 +55,8 @@ class Iot(Base):
 Base.metadata.create_all(bind=engine)
 
 class EntityCreate(BaseModel):
-    voltageIotId: str
-    currentIotId: str
+    voltageIotId: uuid.UUID
+    currentIotId: uuid.UUID
     name: str
     description: Optional[str] = None
     location: Optional[str] = None
@@ -81,7 +81,6 @@ class IotCreate(BaseModel):
     name: str
     description: Optional[str] = None
     location: Optional[str] = None
-    connectionType: str
     protocol: str
     voltage: bool
     current: bool
