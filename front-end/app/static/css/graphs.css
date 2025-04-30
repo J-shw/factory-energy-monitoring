@@ -1,7 +1,7 @@
-.iot-charts .collection {
+#iot-charts .collection {
     display: flex;
 }
-.iot-charts .collection .chart-container {
+#iot-charts .collection .chart-container {
     flex: 1;
     height: 300px;
     margin: 20px auto; 
