@@ -1,4 +1,5 @@
 const iotSelect = document.getElementById('iot-select');
+let iotsList = null
 
 fetch('/get/iot')
 .then(response => {
@@ -9,7 +10,9 @@ fetch('/get/iot')
 })
 .then(data => {
     console.log('Iot data:', data);
-    data.forEach(iot => {
+    iotsList = data;
+
+    iotsList.forEach(iot => {
         let option = document.createElement('option')
         option.value = iot.id;
         option.textContent = iot.name;
