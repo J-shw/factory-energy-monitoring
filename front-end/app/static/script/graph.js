@@ -1,37 +1,30 @@
 const deviceCharts = {};
+let currentIoTId = null;
 
-function createDeviceChart(deviceId, deviceName) {
-    const charts = document.getElementById('charts');
+function createIotChart(iotId) {
+    const charts = document.getElementById('iot-charts');
+    charts.innerHTML = '';
 
     const collection = document.createElement('div');
     collection.classList.add('collection');
-
-    const deviceArea = document.createElement('div');
-    deviceArea.id = `deviceArea-${deviceId}`;
 
     const ampChartContainer = document.createElement('div');
     const voltsChartContainer = document.createElement('div');
 
     const ampsCanvas = document.createElement('canvas');
-    ampsCanvas.id = `ampsChart-${deviceId}`;
+    ampsCanvas.id = `ampsChart-${iotId}`;
     ampChartContainer.classList.add('chart-container');
     ampChartContainer.appendChild(ampsCanvas);
 
     const voltsCanvas = document.createElement('canvas');
-    voltsCanvas.id = `voltsChart-${deviceId}`;
+    voltsCanvas.id = `voltsChart-${iotId}`;
     voltsChartContainer.classList.add('chart-container');
     voltsChartContainer.appendChild(voltsCanvas);
-
-    const title = document.createElement('h2');
-    title.textContent = deviceName;
 
     collection.appendChild(ampChartContainer);
     collection.appendChild(voltsChartContainer)
 
-    deviceArea.appendChild(title);
-    deviceArea.appendChild(collection);
-
-    charts.appendChild(deviceArea);
+    charts.appendChild(collection);
 
     const ampsCtx = ampsCanvas.getContext('2d');
     const voltsCtx = voltsCanvas.getContext('2d');
@@ -49,39 +42,24 @@ function createDeviceChart(deviceId, deviceName) {
     });
 
     // Store charts in the deviceCharts object
-    deviceCharts[deviceId] = { ampsChart, voltsChart };
-    
+    deviceCharts[iotId] = { ampsChart, voltsChart };
+
 }
 
-function updateDeviceCharts(payload) {
-    const deviceId = payload.deviceId;
-    console.log(deviceId)
+function updateIotCharts(payload) {
+    const iotId = payload.iotId;
+    const iotSelect = document.getElementById('iot-select');
 
-    if (!deviceCharts[deviceId]) {
-        let deviceName = 'Unkown Device'
-        fetch('/devices/' + deviceId)
-        .then(response => {
-            if (!response.ok) {
-            throw new Error(`HTTP error - status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            createDeviceChart(deviceId, data.name);
-        })
-        .catch(error => {
-            console.error('Failed to fetch device data:', error);
-            createDeviceChart(deviceId, deviceName);
-        });
+    console.log(iotId)
+    if (iotSelect.value == iotId) {
+        const { ampsChart, voltsChart } = deviceCharts[deviceId];
+
+        ampsChart.data.labels.push(payload.timestamp);
+        ampsChart.data.datasets[0].data.push(payload.amps);
+        ampsChart.update();
+    
+        voltsChart.data.labels.push(payload.timestamp);
+        voltsChart.data.datasets[0].data.push(payload.volts);
+        voltsChart.update();
     }
-
-    const { ampsChart, voltsChart } = deviceCharts[deviceId];
-
-    ampsChart.data.labels.push(payload.timestamp);
-    ampsChart.data.datasets[0].data.push(payload.amps);
-    ampsChart.update();
-
-    voltsChart.data.labels.push(payload.timestamp);
-    voltsChart.data.datasets[0].data.push(payload.volts);
-    voltsChart.update();
 }
