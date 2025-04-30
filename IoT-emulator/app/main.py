@@ -100,26 +100,64 @@ logging.info(f"Number of iots: {num_iots}")
 
 try:
   while True:
+    entity = random.choice(entities)
 
-    iot = random.choice(iots)
+    voltage_iot = None
+    current_iot = None
+    single_iot = False
 
-    voltage_ten_percent=iot["voltage"]*0.1
+    if entity['voltageIotId'] == entity['currentIotId']:
+      single_iot = True
+      for iot in iots:
+        if iot['id'] == entity['voltageIotId']:
+            iot_single = iot
+    else:
+      for iot in iots:
+        if iot['id'] == entity['voltageIotId']:
+            voltage_iot = iot
+        if iot['id'] == entity['currentIotId']:
+            current_iot = iot
+
+
+    voltage_ten_percent=entity["voltageRating"]*0.1
     
     sleep = random.uniform(0.1,1)
     current_time = datetime.datetime.now(datetime.timezone.utc)
-    amps = random.uniform(0,iot['currentRatingAmps'])
-    volts = random.uniform(iot["voltage"]-voltage_ten_percent,iot["voltage"]+voltage_ten_percent)
+    amps = random.uniform(0,entity['currentRating'])
+    volts = random.uniform(entity["voltageRating"]-voltage_ten_percent,entity["voltageRating"]+voltage_ten_percent)
 
-    if iot['connectionType'] == 'mqtt':
-      send_mqtt(f"{iot["id"]}-energy-data", json.dumps({
-        "timestamp": current_time.isoformat(),
-        "amps": round(amps,2),
-        "volts": round(volts,2),
-        "deviceId": iot["id"]
-      }))
-    elif iot['connectionType'] == 'opc':
-      send_opcua_values([iot["id"], round(amps,2), round(volts,2), current_time])
+    if single_iot:
+      if iot_single['connectionType'] == 'mqtt':
+        send_mqtt(f"{iot_single["id"]}-energy-data", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "volts": round(volts,2),
+          "amps": round(amps,2),
+          "iotId": iot_single["id"]
+        }))
+      elif iot_single['protocol'] == 'opc':
+        send_opcua_values([iot_single["id"], round(amps,2), round(volts,2), current_time])
+    else:
+      # Voltage IoT
+      if voltage_iot['protocol'] == 'mqtt':
+        send_mqtt(f"{voltage_iot["id"]}-energy-data", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "volts": round(volts,2),
+          "iotId": voltage_iot["id"]
+        }))
+      elif voltage_iot['protocol'] == 'opc':
+        send_opcua_values([voltage_iot["id"], round(amps,2), round(volts,2), current_time])
       
+      # Current IoT
+      if current_iot['protocol'] == 'mqtt':
+        send_mqtt(f"{current_iot["id"]}-energy-data", json.dumps({
+          "timestamp": current_time.isoformat(),
+          "amps": round(amps,2),
+          "iotId": current_iot["id"]
+        }))
+      elif current_iot['connectionType'] == 'opc':
+        send_opcua_values([current_iot["id"], round(amps,2), round(volts,2), current_time])
+        
+        
     time.sleep(sleep)
 except KeyboardInterrupt:
   logging.info("Server stopped.")
