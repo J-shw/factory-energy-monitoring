@@ -97,6 +97,7 @@ if (iots is None or len(iots) == 0) & (entities is None or len(entities) == 0):
 
 num_iots = len(iots)
 logging.info(f"Number of iots: {num_iots}")
+logging.info(f"Number of entities: {len(entities)}")
 
 try:
   while True:
@@ -127,7 +128,7 @@ try:
     volts = random.uniform(entity["voltageRating"]-voltage_ten_percent,entity["voltageRating"]+voltage_ten_percent)
 
     if single_iot:
-      if iot_single['connectionType'] == 'mqtt':
+      if iot_single['protocol'] == 'mqtt':
         send_mqtt(f"{iot_single["id"]}-energy-data", json.dumps({
           "timestamp": current_time.isoformat(),
           "volts": round(volts,2),
@@ -154,12 +155,16 @@ try:
           "amps": round(amps,2),
           "iotId": current_iot["id"]
         }))
-      elif current_iot['connectionType'] == 'opc':
+      elif current_iot['protocol'] == 'opc':
         send_opcua_values([current_iot["id"], round(amps,2), round(volts,2), current_time])
         
         
     time.sleep(sleep)
+except Exception as e:
+  logging.error(f"Error: {e}")
 except KeyboardInterrupt:
   logging.info("Server stopped.")
 finally:
   mqtt_client.disconnect()
+  opc_client.disconnect()
+  sys.exit()
