@@ -8,16 +8,13 @@ socket.on('disconnect', function() {
 });
 
 
-socket.on('mqtt_message', function(data) {
-    console.log('Received message: ' + data.topic + ' ' + data.payload)
-    const messages = document.getElementById('messages');
-    const newMessage = document.createElement('li');
-    newMessage.textContent = `Topic: ${data.topic}, Payload: ${data.payload}`;
-    messages.appendChild(newMessage);
+socket.on('iot_message', function(data) {
+    console.log('Received message: ')
+    console.log(data)
 
      try {
-        const payload = JSON.parse(data.payload);
-        updateDeviceCharts(payload);
+        const payload = data.payload;
+        updateIotCharts(payload);
     } catch (error) {
         console.error('Error parsing payload:', error);
     }
