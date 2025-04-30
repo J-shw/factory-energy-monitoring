@@ -19,61 +19,56 @@ except Exception as e:
 # MQTT
 def on_connect(client, userdata, flags, rc):
     logging.info("MQTT connected with result code "+str(rc))
-    client.subscribe("energy-data")
+    client.subscribe("energy-data/+")
 
 def on_message(client, userdata, msg):
     logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
-    if '-energy-data' in msg.topic:
-        logging.info('Received energy data message')
-        try: # Store data
-            db = SessionLocal()
-            payload_str = msg.payload.decode('utf-8')
-            payload_create = LogCreate(**json.loads(payload_str))
-            log_entry = Log(**payload_create.dict())
 
-            db.add(log_entry)
-            db.commit()
-            db.refresh(log_entry)
-            db.close()
-            logging.info("Log entry added to database")
+    try: # Store data
+        db = SessionLocal()
+        payload_str = msg.payload.decode('utf-8')
+        payload_create = LogCreate(**json.loads(payload_str))
+        log_entry = Log(**payload_create.dict())
 
-        except Exception as e:
-            logging.warning(f"Error adding log entry: {e}")
-            db.rollback()
-        finally:
-            db.close()
+        db.add(log_entry)
+        db.commit()
+        db.refresh(log_entry)
+        db.close()
+        logging.info("Log entry added to database")
 
-        try: # Emit data to SocketIO
-            sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
-            logging.debug("mqtt_data emitted successfully")
-        except Exception as e:
-            logging.error(f"Error emitting mqtt_data: {e}")
+    except Exception as e:
+        logging.warning(f"Error adding log entry: {e}")
+        db.rollback()
+    finally:
+        db.close()
 
-        try: # Stream data for analysis
-            url = "http://analysis:9090/process/"
-            headers = {"Content-Type": "application/json"}
+    try: # Emit data to SocketIO
+        sio.emit('mqtt_data', {'topic': msg.topic, 'payload': msg.payload})
+        logging.debug("mqtt_data emitted successfully")
+    except Exception as e:
+        logging.error(f"Error emitting mqtt_data: {e}")
 
-            log_data = {
-                "id": log_entry.id,
-                "iotId": log_entry.iotId,
-                "volts": log_entry.volts,
-                "amps": log_entry.amps,
-                "timestamp": log_entry.timestamp.isoformat()
-            }
+    try: # Stream data for analysis
+        url = "http://analysis-system:9090/process/"
+        headers = {"Content-Type": "application/json"}
 
-            response = requests.post(url, data=json.dumps(log_data), headers=headers)
-            response.raise_for_status()
+        log_data = {
+            "id": log_entry.id,
+            "iotId": log_entry.iotId,
+            "volts": log_entry.volts,
+            "amps": log_entry.amps,
+            "timestamp": log_entry.timestamp.isoformat()
+        }
 
-            logging.info(f"Response Status Code: {response.status_code}")
+        response = requests.post(url, data=json.dumps(log_data), headers=headers)
+        response.raise_for_status()
 
-        except json.JSONDecodeError:
-            logging.error("Response is not valid JSON")
-        except Exception as e:
-            logging.error(f"Error: {e}")
-    else:
-        logging.info('Received none energy data message')
+        logging.info(f"Response Status Code: {response.status_code}")
 
-    
+    except json.JSONDecodeError:
+        logging.error("Response is not valid JSON")
+    except Exception as e:
+        logging.error(f"Error: {e}")
 
 
 client_id = "communication_system"

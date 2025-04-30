@@ -129,7 +129,7 @@ try:
 
     if single_iot:
       if iot_single['protocol'] == 'mqtt':
-        send_mqtt(f"{iot_single["id"]}-energy-data", json.dumps({
+        send_mqtt(f"energy-data/{iot_single["id"]}", json.dumps({
           "timestamp": current_time.isoformat(),
           "volts": round(volts,2),
           "amps": round(amps,2),
