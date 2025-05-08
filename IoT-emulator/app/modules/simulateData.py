@@ -16,7 +16,7 @@ def send_mqtt(topic, message):
 async def send_opcua_values(iot_id, amps, volts, timestamp):
     if opc_client:
         try:
-            _logger.debug(f"Sending OPC | Device ID: {iot_id}, Amps: {amps}, Volts: {volts}, Timestamp: {timestamp}")
+            _logger.debug(f"Sending OPC | Iot ID: {iot_id}, Amps: {amps}, Volts: {volts}, Timestamp: {timestamp}")
 
             id_node = opc_client.get_node(opc_input_node_ids["iot_id"])
             amps_node = opc_client.get_node(opc_input_node_ids["amps"])
@@ -56,7 +56,7 @@ async def simulate_iot_data(iots, entities):
         mqtt_client = None
 
     # - - - Connect to OPC UA - - -
-    opc_url = f"opc.tcp://{opc_host}:4840"
+    opc_url = f"opc.tcp://admin@{opc_host}:4840"
     _logger.info(f"Connecting to OPC UA server at {opc_url}...")
     try:
         opc_client = Client(opc_url)
