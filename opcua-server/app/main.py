@@ -6,56 +6,56 @@ from datetime import datetime, timezone
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger('asyncua')
 
-entity_nodes = {}
+iot_nodes = {}
 
 async def data_change_callback(node, val, data):
     _logger.info(f"Data change on node {node.nodeid}: {val}")
 
     input_obj_node = node.get_parent()
 
-    input_entity_id_node = input_obj_node.get_child(["2:input_entity_id"])
+    input_iot_id_node = input_obj_node.get_child(["2:input_iot_id"])
     input_amps_node = input_obj_node.get_child(["2:input_amps"])
     input_volts_node = input_obj_node.get_child(["2:input_volts"])
     input_timestamp_node = input_obj_node.get_child(["2:input_timestamp"])
 
     try:
-        entity_id = await input_entity_id_node.read_value()
+        iot_id = await input_iot_id_node.read_value()
         amps = await input_amps_node.read_value()
         volts = await input_volts_node.read_value()
         timestamp = await input_timestamp_node.read_value()
 
-        _logger.info(f"Received data for Entity ID: {entity_id}, Amps: {amps}, Volts: {volts}, Timestamp: {timestamp}")
+        _logger.info(f"Received data for Iot ID: {iot_id}, Amps: {amps}, Volts: {volts}, Timestamp: {timestamp}")
 
         server = node.get_server()
         objects = server.get_objects_node()
-        entities_obj_node = await objects.get_child(["2:Entities"])
+        iots_obj_node = await objects.get_child(["2:Iots"])
 
-        if entity_id not in entity_nodes:
-            _logger.info(f"Creating new node for entity: {entity_id}")
+        if iot_id not in iot_nodes:
+            _logger.info(f"Creating new node for iot: {iot_id}")
 
-            entity_obj_node = await entities_obj_node.add_object(server.get_namespace_index("opcua-server"), f"Entity_{entity_id}")
+            iot_obj_node = await iots_obj_node.add_object(server.get_namespace_index("opcua-server"), f"Iot_{iot_id}")
 
-            entity_id_var = await entity_obj_node.add_variable(server.get_namespace_index("opcua-server"), "entity_id", entity_id, varianttype=ua.VariantType.String)
-            await entity_id_var.set_writable()
-            amps_var = await entity_obj_node.add_variable(server.get_namespace_index("opcua-server"), "amps", amps, varianttype=ua.VariantType.Float)
+            iot_id_var = await iot_obj_node.add_variable(server.get_namespace_index("opcua-server"), "iot_id", iot_id, varianttype=ua.VariantType.String)
+            await iot_id_var.set_writable()
+            amps_var = await iot_obj_node.add_variable(server.get_namespace_index("opcua-server"), "amps", amps, varianttype=ua.VariantType.Float)
             await amps_var.set_writable()
-            volts_var = await entity_obj_node.add_variable(server.get_namespace_index("opcua-server"), "volts", volts, varianttype=ua.VariantType.Float)
+            volts_var = await iot_obj_node.add_variable(server.get_namespace_index("opcua-server"), "volts", volts, varianttype=ua.VariantType.Float)
             await volts_var.set_writable()
-            timestamp_var = await entity_obj_node.add_variable(server.get_namespace_index("opcua-server"), "timestamp", timestamp, varianttype=ua.VariantType.DateTime)
+            timestamp_var = await iot_obj_node.add_variable(server.get_namespace_index("opcua-server"), "timestamp", timestamp, varianttype=ua.VariantType.DateTime)
             await timestamp_var.set_writable()
 
-            entity_nodes[entity_id] = {
-                "obj": entity_obj_node,
+            iot_nodes[iot_id] = {
+                "obj": iot_obj_node,
                 "amps": amps_var,
                 "volts": volts_var,
                 "timestamp": timestamp_var
             }
         else:
-            _logger.info(f"Updating existing node for eneity: {entity_id}")
-            entity_info = entity_nodes[entity_id]
-            await entity_info["amps"].write_value(amps)
-            await entity_info["volts"].write_value(volts)
-            await entity_info["timestamp"].write_value(timestamp)
+            _logger.info(f"Updating existing node for iot: {iot_id}")
+            iot_info = iot_nodes[iot_id]
+            await iot_info["amps"].write_value(amps)
+            await iot_info["volts"].write_value(volts)
+            await iot_info["timestamp"].write_value(timestamp)
 
     except Exception as e:
         _logger.error(f"Error in data change callback: {e}")
@@ -71,11 +71,11 @@ async def main():
 
     objects = server.get_objects_node()
 
-    entities_obj = await objects.add_object(idx, "Entities")
+    iots_obj = await objects.add_object(idx, "Iots")
 
     data_input_obj = await objects.add_object(idx, "DataInput")
 
-    input_id_var = await data_input_obj.add_variable(idx, "input_entity_id", "", varianttype=ua.VariantType.String)
+    input_id_var = await data_input_obj.add_variable(idx, "input_iot_id", "", varianttype=ua.VariantType.String)
     await input_id_var.set_writable()
 
     input_amps_var = await data_input_obj.add_variable(idx, "input_amps", 0.0, varianttype=ua.VariantType.Float)
