@@ -22,6 +22,17 @@ def create_device(entity: EntityCreate, db: Session = Depends(get_db)):
     db.refresh(db_item)
     return db_item
 
+@app.get("/get/iot/entity/{iot_id}", response_model=EntityOut)
+def get_entity_by_iot_id(iot_id: str, db: Session = Depends(get_db)):
+    db_item = db.query(Iot).filter(Iot.id == iot_id).first()
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Iot not found")
+
+    db_item = db.query(Entity).filter(Entity.voltageIotId == iot_id or Entity.currentIotId == iot_id)
+    if db_item is None:
+        raise HTTPException(status_code=404, detail="Iot not used by entity")
+    return db_item
+
 @app.get("/get/entity/{entity_id}", response_model=EntityOut)
 def read_item(entity_id: str, db: Session = Depends(get_db)):
     db_item = db.query(Entity).filter(Entity.id == entity_id).first()
