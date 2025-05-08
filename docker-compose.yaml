@@ -51,9 +51,13 @@ services:
     depends_on:
       - mosquitto
       - front-end
+      - opcua-server
       - analysis-system
+    ports:
+      - "9000:9000"
     environment:
       MQTT_BROKER_HOST: mosquitto
+      OPC_UA_SERVER_HOST: opcua-server
       DATABASE_URL: "postgres:password@database-server"
 
   iot-emulator:
