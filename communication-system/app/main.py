@@ -1,83 +1,152 @@
-import paho.mqtt.client as mqtt
-from sqlalchemy.orm import Session
-from models import Log, SessionLocal, LogCreate, LogOut
-import logging, os, socketio, json, requests
+from modules.fastapi_app import create_app
+from modules.mqtt_handler import setup_mqtt_client
+from modules.opcua_handler import setup_opcua_client, OpcuaDataChangeHandler, periodic_discovery_task
+import asyncio, logging, os, sys, time, requests, json, uvicorn
+
+from models import SessionLocal
+
+import socketio
 
 logging.basicConfig(level=logging.DEBUG)
+_logger = logging.getLogger(__name__)
 
+# - - - Configuration - - -
 mqtt_host = os.environ.get("MQTT_BROKER_HOST")
+fastapi_host = os.environ.get("FASTAPI_HOST", "0.0.0.0")
+fastapi_port = int(os.environ.get("FASTAPI_PORT", 9000))
+opc_host = os.environ.get("OPC_UA_SERVER_HOST")
+opc_port = int(os.environ.get("OPC_UA_SERVER_PORT", 4840))
+opc_url = f"opc.tcp://{opc_host}:{opc_port}"
+opc_namespace_uri = "opcua-server"
+analysis_system_url = os.environ.get("ANALYSIS_SYSTEM_URL", "http://analysis-system:9090/process/")
+
 
 sio = socketio.Client()
 
-logging.debug("Attempting to connect to SocketIO server")
+@sio.event
+def connect():
+    _logger.info("Connected to SocketIO server successfully")
+
+@sio.event
+def disconnect():
+    _logger.info("Disconnected from SocketIO server")
+
+
+_logger.debug("Attempting to connect to SocketIO server")
 try:
-    sio.connect('http://front-end:8080', transports=['websocket'])
-    logging.info("Connected to SocketIO server successfully")
+    sio.connect('http://front-end:8080', transports=['websocket'], wait_timeout=5)
 except Exception as e:
-    logging.error(f"Error connecting to SocketIO server: {e}")
+    _logger.error(f"Error connecting to SocketIO server: {e}")
 
-# MQTT
-def on_connect(client, userdata, flags, rc):
-    logging.info("MQTT connected with result code "+str(rc))
-    client.subscribe("energy-data/+")
 
-def on_message(client, userdata, msg):
-    logging.debug(f"Client '{client._client_id.decode('utf-8')}' received: {msg.topic} {msg.payload}")
-    msgPayload = msg.payload.decode('utf-8')
+async def main():
+    # - - - Setup and Start MQTT Client - - -
+    mqtt_client = setup_mqtt_client(
+        mqtt_host=mqtt_host,
+        client_id="communication_system",
+        db_session_factory=SessionLocal,
+        sio_client=sio,
+        analysis_url=analysis_system_url
+    )
+    if mqtt_client:
+         mqtt_client.loop_start()
+         _logger.info("MQTT client loop started in background thread.")
 
-    try: # Store data
-        db = SessionLocal()
-        payload_create = LogCreate(**json.loads(msgPayload))
-        log_entry = Log(**payload_create.dict())
 
-        db.add(log_entry)
-        db.commit()
-        db.refresh(log_entry)
-        db.close()
-        logging.info("Log entry added to database")
+    # - - - Setup and Connect OPC UA Client - - -
+    opcua_handler = OpcuaDataChangeHandler(
+        db_session_factory=SessionLocal,
+        sio_client=sio,
+        analysis_url=analysis_system_url
+    )
 
+    opc_client, opc_subscription = await setup_opcua_client(
+        opc_url=opc_url,
+        opc_namespace_uri=opc_namespace_uri,
+        opcua_handler=opcua_handler
+    )
+    
+    # --- Start Periodic OPC UA Discovery Task ---
+    opc_discovery_task = None
+    if opc_client and opc_subscription:
+        _logger.info("Creating OPC UA periodic discovery task.")
+        opc_discovery_task = asyncio.create_task(
+            periodic_discovery_task(
+                opc_client=opc_client,
+                opc_namespace_uri=opc_namespace_uri,
+                opc_subscription=opc_subscription,
+                interval=15
+            )
+        )
+        _logger.info("OPC UA periodic discovery task created.")
+    else:
+        _logger.warning("OPC UA client not connected, periodic discovery task will not start.")
+
+
+
+    # - - - Setup and Run FastAPI Server - - -
+    app = create_app()
+
+    _logger.info(f"Starting FastAPI server on {fastapi_host}:{fastapi_port}...")
+    config = uvicorn.Config(
+        app,
+        host=fastapi_host,
+        port=fastapi_port,
+        log_level="info"
+    )
+    server = uvicorn.Server(config)
+
+    fastapi_task = asyncio.create_task(server.serve())
+    _logger.info("FastAPI server task created.")
+
+
+    # - - - Keep the event loop running - - -
+    try:
+        await asyncio.Future()
+    except asyncio.CancelledError:
+        _logger.info("Asyncio future cancelled.")
+
+    # - - - Cleanup - - -
+    _logger.info("Shutting down...")
+    if mqtt_client:
+        _logger.info("Stopping MQTT client loop...")
+        mqtt_client.loop_stop()
+        _logger.info("Disconnecting MQTT client...")
+        mqtt_client.disconnect()
+        _logger.info("MQTT client disconnected.")
+
+    if opc_client:
+        _logger.info("Disconnecting OPC UA client...")
+        if opc_subscription:
+            try:
+                await opc_subscription.unsubscribe(opc_subscription.items)
+                _logger.info("OPC UA unsubscribed from all items.")
+            except Exception as e:
+                _logger.error(f"Error during OPC UA unsubscribe: {e}")
+        try:
+            await opc_client.disconnect()
+            _logger.info("OPC UA client disconnected.")
+        except Exception as e:
+            _logger.error(f"Error during OPC UA disconnect: {e}")
+            
+    if opc_discovery_task:
+        _logger.info("Cancelling OPC UA periodic discovery task...")
+        opc_discovery_task.cancel()
+        try:
+            await opc_discovery_task
+        except asyncio.CancelledError:
+            _logger.info("OPC UA periodic discovery task cancelled.")
+
+
+
+# - - - Entry Point - - -
+if __name__ == "__main__":
+    _logger.info("Starting communication system...")
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        _logger.info("Communication system stopped by user (KeyboardInterrupt).")
     except Exception as e:
-        logging.warning(f"Error adding log entry: {e}")
-        db.rollback()
+        _logger.critical(f"An unhandled error occurred during execution: {e}", exc_info=True)
     finally:
-        db.close()
-
-    try: # Emit data to SocketIO
-        sio.emit('iot_data', {'iotId': log_entry.iotId, 'payload': msgPayload, 'source': {'protocol': 'mqtt' ,'topic': msg.topic}})
-        logging.debug("iot_data emitted successfully")
-    except Exception as e:
-        logging.error(f"Error emitting iot_data: {e}")
-
-    try: # Stream data for analysis
-        url = "http://analysis-system:9090/process/"
-        headers = {"Content-Type": "application/json"}
-
-        log_data = {
-            "id": log_entry.id,
-            "iotId": log_entry.iotId,
-            "volts": log_entry.volts,
-            "amps": log_entry.amps,
-            "timestamp": log_entry.timestamp.isoformat()
-        }
-
-        response = requests.post(url, data=json.dumps(log_data), headers=headers)
-        response.raise_for_status()
-
-        logging.info(f"Response Status Code: {response.status_code}")
-
-    except json.JSONDecodeError:
-        logging.error("Response is not valid JSON")
-    except Exception as e:
-        logging.error(f"Error: {e}")
-
-
-client_id = "communication_system"
-client = mqtt.Client(client_id=client_id)
-
-client.on_connect = on_connect
-client.on_message = on_message
-
-
-client.connect(mqtt_host, 1883, 60)
-
-client.loop_forever()
+        _logger.info("Communication system finished.")
