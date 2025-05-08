@@ -1,2 +1,2 @@
-opcua
+asyncua
 requests
