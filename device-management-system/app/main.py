@@ -22,16 +22,16 @@ def create_entity(entity: EntityCreate, db: Session = Depends(get_db)):
     db.refresh(db_item)
     return db_item
 
-@app.get("/get/iot/entity/{iot_id}", response_model=EntityOut)
+@app.get("/get/iot/{iot_id}/entity/", response_model=list[EntityOut])
 def get_entity_by_iot_id(iot_id: str, db: Session = Depends(get_db)):
-    db_item = db.query(Iot).filter(Iot.id == iot_id).first()
-    if db_item is None:
+    iot_exists = db.query(Iot).filter(Iot.id == iot_id).first()
+    if iot_exists is None:
         raise HTTPException(status_code=404, detail="Iot not found")
 
-    db_item = db.query(Entity).filter(Entity.voltageIotId == iot_id or Entity.currentIotId == iot_id)
-    if db_item is None:
+    entity_items = db.query(Entity).filter(Entity.voltageIotId == iot_id or Entity.currentIotId == iot_id).all()
+    if entity_items is None:
         raise HTTPException(status_code=404, detail="Iot not used by entity")
-    return db_item
+    return entity_items
 
 @app.get("/get/entity/{entity_id}", response_model=EntityOut)
 def get_enetity_by_id(entity_id: str, db: Session = Depends(get_db)):
