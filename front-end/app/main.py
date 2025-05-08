@@ -20,6 +20,12 @@ def configuration_page():
 def events_page():
     return render_template('events.html')
 
+@app.route('/health')
+def health():
+    return jsonify({"status": "ok"}), 200
+
+# Proxies - - - -
+
 @app.route('/get/iot', methods=['GET'])
 def get_iot():
     try:
@@ -32,7 +38,7 @@ def get_iot():
         return jsonify({"error": "Invalid Json response"}), 500
 
 @app.route('/get/iot/<uid>', methods=['GET'])
-def get_specific_iot(uid):
+def get_iot_by_uid(uid):
     try:
         data = requests.get(f'http://device-management-system:9002/get/iot/{uid}')
         data.raise_for_status()
@@ -42,10 +48,10 @@ def get_specific_iot(uid):
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
 
-@app.route('/get/device/<UID>', methods=['GET'])
-def device(UID):
+@app.route('/get/entity/<UID>', methods=['GET'])
+def get_entity_by_uid(UID):
     try:
-        data = requests.get(f'http://device-management-system:9002/devices/{UID}')
+        data = requests.get(f'http://device-management-system:9002/get/entity/{UID}')
         data.raise_for_status()
         return jsonify(data.json()), 200
     except requests.exceptions.RequestException as e:
@@ -53,11 +59,17 @@ def device(UID):
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
 
-@app.route('/health')
-def health():
-    return jsonify({"status": "ok"}), 200
-
-
+@app.route('/get/event/', methods=['GET'])
+def get_event():
+    try:
+        data = requests.get(f'http://analysis-system:9090/get/event/')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+    
 @app.route('/add/device', methods=['POST'])
 def add_device():
     try:
@@ -77,22 +89,7 @@ def add_device():
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
-@app.route('/get/events', methods=['GET'])
-def get_events():
-    try:
-        logging.info("Getting events")
-
-        response = requests.get("http://analysis-system:9002/get/event")
-
-        if response.status_code == 201: 
-            return jsonify(response.json()), 201
-        else:
-            return jsonify({"error": response.json()}), response.status_code
-
-    except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Error communicating with Analysis System API: {e}"}), 500
-    except Exception as e:
-        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
+# Websocket - - - -
 
 @socketio.on('connect')
 def connect():
