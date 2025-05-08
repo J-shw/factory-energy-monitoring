@@ -73,6 +73,7 @@ class EntityCreate(BaseModel):
 class EntityOut(EntityCreate):
     id: int
     dateCreated: datetime.datetime
+    isActive: bool
 
     class Config:
         orm_mode = True
