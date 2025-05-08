@@ -45,8 +45,8 @@ class EventOut(EventCreate):
         orm_mode = True
 
 class EnergyDataInput(BaseModel):
-    id: int
+    iotId: int
     entityId: str
-    volts: float
-    amps: float
+    volts: Optional[float] = None
+    amps: Optional[float] = None
     timestamp: datetime.datetime
