@@ -1,4 +1,4 @@
-from main import _logger, opc_input_node_ids, opc_data_types, mqtt_host, opc_host, client_id
+from main import _logger, opc_data_types, mqtt_host, opc_host, client_id
 import asyncio, datetime, random, json
 from asyncua import Client, ua
 import paho.mqtt.client as mqtt
