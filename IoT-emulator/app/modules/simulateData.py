@@ -3,6 +3,8 @@ import asyncio, datetime, random, json
 from asyncua import Client, ua
 import paho.mqtt.client as mqtt
 
+_discovered_opc_node_ids = {}
+
 def send_mqtt(topic, message):
     if mqtt_client:
         _logger.debug(f'Sending MQTT | Topic: {topic} | Message: {message}')
@@ -14,14 +16,14 @@ def send_mqtt(topic, message):
         _logger.warning("MQTT client not connected. Cannot send message.")
 
 async def send_opcua_values(iot_id, amps, volts, timestamp):
-    if opc_client:
+    if opc_client and _discovered_opc_node_ids:
         try:
             _logger.debug(f"Sending OPC | Iot ID: {iot_id}, Amps: {amps}, Volts: {volts}, Timestamp: {timestamp}")
 
-            id_node = opc_client.get_node(opc_input_node_ids["iot_id"])
-            amps_node = opc_client.get_node(opc_input_node_ids["amps"])
-            volts_node = opc_client.get_node(opc_input_node_ids["volts"])
-            time_node = opc_client.get_node(opc_input_node_ids["timestamp"])
+            id_node = opc_client.get_node(_discovered_opc_node_ids["iot_id"])
+            amps_node = opc_client.get_node(_discovered_opc_node_ids["amps"])
+            volts_node = opc_client.get_node(_discovered_opc_node_ids["volts"])
+            time_node = opc_client.get_node(_discovered_opc_node_ids["timestamp"])
 
             id_dv = ua.DataValue(ua.Variant(iot_id, opc_data_types["iot_id"]))
             amps_dv = ua.DataValue(ua.Variant(amps, opc_data_types["amps"]))
@@ -38,8 +40,46 @@ async def send_opcua_values(iot_id, amps, volts, timestamp):
         except Exception as e:
             _logger.error(f"Error writing to OPC UA: {e}")
     else:
-        _logger.warning("OPC UA client not connected. Cannot send values.")
+        _logger.warning("OPC UA client not connected or NodeIds not discovered. Cannot send values.")
 
+async def discover_opc_nodes(client: Client):
+    global _discovered_opc_node_ids
+    _discovered_opc_node_ids = {} # Reset in case of reconnect
+
+    try:
+        _logger.info("Discovering OPC UA NodeIds...")
+        uri = "opcua-server"
+        ns_idx = await client.get_namespace_index(uri)
+        _logger.debug(f"Discovered namespace index for '{uri}': {ns_idx}")
+
+        if ns_idx is None:
+             _logger.error(f"Namespace URI '{uri}' not found on server.")
+             return False
+        
+        objects = client.get_objects_node()
+
+        data_input_obj_node = await objects.get_child([f"{ns_idx}:DataInput"])
+        _logger.debug(f"Found DataInput object: {data_input_obj_node}")
+
+        input_id_node = await data_input_obj_node.get_child([f"{ns_idx}:input_iot_id"])
+        input_amps_node = await data_input_obj_node.get_child([f"{ns_idx}:input_amps"])
+        input_volts_node = await data_input_obj_node.get_child([f"{ns_idx}:input_volts"])
+        input_time_node = await data_input_obj_node.get_child([f"{ns_idx}:input_timestamp"])
+
+        _discovered_opc_node_ids = {
+            "iot_id": input_id_node.nodeid,
+            "amps": input_amps_node.nodeid,
+            "volts": input_volts_node.nodeid,
+            "timestamp": input_time_node.nodeid
+        }
+
+        _logger.info(f"Discovered OPC UA NodeIds: {_discovered_opc_node_ids}")
+        return True
+
+    except Exception as e:
+        _logger.error(f"Error during OPC UA NodeId discovery: {e}")
+        _discovered_opc_node_ids = {}
+        return False
 
 async def simulate_iot_data(iots, entities):
     global mqtt_client, opc_client
@@ -62,6 +102,12 @@ async def simulate_iot_data(iots, entities):
         opc_client = Client(opc_url)
         await opc_client.connect()
         _logger.info("OPC UA client connected.")
+
+        discovery_success = await discover_opc_nodes(opc_client)
+        if not discovery_success:
+            _logger.error("Failed to discover necessary OPC UA NodeIds. OPC UA functionality will be disabled.")
+            await opc_client.disconnect()
+            opc_client = None
     except Exception as e:
         _logger.error(f"Failed to connect to OPC UA: {e}")
         opc_client = None
