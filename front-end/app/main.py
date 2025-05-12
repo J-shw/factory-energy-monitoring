@@ -69,14 +69,14 @@ def get_event():
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
     
-@app.route('/add/device', methods=['POST'])
+@app.route('/create/iot', methods=['POST'])
 def add_device():
     try:
         logging.info("Adding device")
         data = request.get_json()
         logging.debug(data)
 
-        response = requests.post("http://devices:9002/device", json=data)
+        response = requests.post("http://device-management-system:9002/create/iot", json=data)
 
         if response.status_code == 201: 
             return jsonify(response.json()), 201
@@ -84,7 +84,7 @@ def add_device():
             return jsonify({"error": response.json()}), response.status_code
 
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Error communicating with Device Management API: {e}"}), 500
+        return jsonify({"error": f"Error communicating with Device Management System API: {e}"}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
