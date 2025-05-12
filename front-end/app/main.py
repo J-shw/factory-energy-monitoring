@@ -1,6 +1,5 @@
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit
-from waitress import serve
 import logging, requests, eventlet
 
 logging.basicConfig(level=logging.DEBUG)
