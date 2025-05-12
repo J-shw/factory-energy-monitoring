@@ -46,7 +46,6 @@ def on_message(client, userdata, msg):
         try: # Emit data to SocketIO
             sio_client.emit('iot_data', {
                 'iotId': str(log_entry.iotId),
-                'payload': msgPayload,
                 'source': {'protocol': 'mqtt' ,'topic': msg.topic},
                 'volts': log_entry.volts,
                 'amps': log_entry.amps,
