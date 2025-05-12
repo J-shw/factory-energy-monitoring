@@ -9,13 +9,6 @@ mqtt_host = os.environ.get("MQTT_BROKER_HOST")
 opc_host = os.environ.get("OPC_UA_SERVER_HOST")
 client_id = "IoT_emulator"
 
-opc_input_node_ids = {
-  "iot_id": "ns=2;i=2",
-  "amps": "ns=2;i=3",
-  "volts": "ns=2;i=4",
-  "timestamp": "ns=2;i=5"
-}
-
 opc_data_types = {
   "iot_id": ua.VariantType.String,
   "amps": ua.VariantType.Float,

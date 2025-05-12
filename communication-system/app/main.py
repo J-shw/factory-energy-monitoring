@@ -1,7 +1,7 @@
 from modules.fastapi_app import create_app
 from modules.mqtt_handler import setup_mqtt_client
 from modules.opcua_handler import setup_opcua_client, OpcuaDataChangeHandler, periodic_discovery_task
-import asyncio, logging, os, sys, time, requests, json, uvicorn
+import asyncio, logging, os, uvicorn
 
 from models import SessionLocal
 

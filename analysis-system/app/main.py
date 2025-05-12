@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models import Event, SessionLocal, EventCreate, EventOut, EnergyDataInput
 import modules.process as process
 from datetime import datetime, timezone
-import uvicorn, logging, json, requests
+import uvicorn, logging, requests
 
 app = FastAPI()
 

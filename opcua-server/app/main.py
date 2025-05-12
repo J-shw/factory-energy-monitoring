@@ -1,8 +1,7 @@
-import asyncio
-import logging
 from asyncua import Server, ua
 from asyncua.ua import NodeId
 from datetime import datetime, timezone
+import asyncio, logging
 
 logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger('asyncua')
