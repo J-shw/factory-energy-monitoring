@@ -13,8 +13,7 @@ socket.on('iot_message', function(data) {
     console.log(data)
 
      try {
-        const payload = JSON.parse(data.payload);
-        updateIotCharts(payload);
+        updateIotCharts(data);
     } catch (error) {
         console.error('Error parsing payload:', error);
     }
