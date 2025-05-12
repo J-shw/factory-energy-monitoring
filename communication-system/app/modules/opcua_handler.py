@@ -25,9 +25,9 @@ class OpcuaDataChangeHandler:
             browse_name = await parent_node.read_browse_name()
 
             try:
-                iot_id_str = browse_name.name.replace("Iot_", "")
+                iot_id_str = browse_name.Name.replace("Iot_", "")
             except Exception as e:
-                 _logger.error(f"OPC UA DataChange: Could not extract iot ID from browse name '{browse_name.name}': {e}")
+                 _logger.error(f"OPC UA DataChange: Could not extract iot ID from browse name '{browse_name.Name}': {e}")
                  return
 
             async with self._lock:
@@ -40,7 +40,7 @@ class OpcuaDataChangeHandler:
                     }
 
                 node_display_name = await node.read_display_name()
-                variable_name = node_display_name.text.lower()
+                variable_name = node_display_name.Text.lower()
 
                 if variable_name in self._iot_data_cache[iot_id_str]:
                      self._iot_data_cache[iot_id_str][variable_name] = val
@@ -177,8 +177,8 @@ async def discover_and_subscribe_iots(opc_client, opc_namespace_idx, iots_node, 
         for iot_obj_node in iot_object_nodes:
             try:
                 browse_name = await iot_obj_node.read_browse_name()
-                if browse_name.name.startswith("Iot_"):
-                    iot_id = browse_name.name.replace("Iot_", "")
+                if browse_name.Name.startswith("Iot_"):
+                    iot_id = browse_name.Name.replace("Iot_", "")
 
                     if iot_id not in _subscribed_iot_ids:
                         _logger.info(f"New iot discovered: {iot_id}. Attempting to subscribe...")
@@ -197,7 +197,7 @@ async def discover_and_subscribe_iots(opc_client, opc_namespace_idx, iots_node, 
                     else:
                          _logger.debug(f"Iot {iot_id} already subscribed. Skipping.")
                 else:
-                     _logger.debug(f"Skipping node with unexpected browse name format: {browse_name.name}")
+                     _logger.debug(f"Skipping node with unexpected browse name format: {browse_name.Name}")
 
             except Exception as e:
                 _logger.error(f"Failed to subscribe to OPC UA nodes for discovered iot object {iot_obj_node}: {e}")
