@@ -134,8 +134,11 @@ function gatherDeviceData() {
           "powerOutage": document.getElementById('powerOutage').checked,
           "highVoltageValue": document.getElementById('upperVoltageLimit').value,
           "lowVoltageValue": document.getElementById('lowerVoltageLimit').value,
-          "overCurrentValue": document.getElementById('upperCurrentLimit').value
+          "overCurrentValue": document.getElementById('upperCurrentLimit').value,
+          "voltageIotId": document.getElementById('voltageIotId').value,
+          "currentIotId": document.getElementById('currentIotId').value
       };
+      addEntity(id, formData);
     }
 }
 
@@ -171,7 +174,7 @@ function addIot(id, formData) {
     });
 }
 
-function addIot(id, formData) {
+function addEntity(id, formData) {
     console.log(id);
     console.log(formData);
 
