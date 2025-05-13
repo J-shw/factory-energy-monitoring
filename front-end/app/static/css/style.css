@@ -44,3 +44,7 @@ body {
     padding: 5px;
     height: 1vh;
 }
+
+.highlight {
+    background-color: var(--highlight);
+}

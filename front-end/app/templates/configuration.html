@@ -7,17 +7,19 @@
 {% endblock %}
 {% block content %}
 <div class="config-option">
-    <a onclick="displayConfigForm('iot')">
+    <a onclick="displayConfigForm('iot')" class="highlight" id="iot_view_btn">
         IoT
     </a>
-    <a onclick="displayConfigForm('entity')">
+    <a onclick="displayConfigForm('entity')" id="entity_view_btn">
         Entity
     </a>
 </div>
 
 <div>
-    <select id="selectConfig">
-    </select>
+    <div style="text-align: center;">
+        <select id="selectConfig">
+        </select>
+    </div>
     <form id="configForm">
     </form>
     <div id="response"></div>

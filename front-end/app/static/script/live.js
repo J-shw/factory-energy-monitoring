@@ -15,7 +15,7 @@ fetch('/get/iot')
     iotsList.forEach(iot => {
         let option = document.createElement('option')
         option.value = iot.id;
-        option.textContent = iot.name;
+        option.textContent = iot.name+" - "+iot.protocol;
         iotSelect.appendChild(option);
     });
 

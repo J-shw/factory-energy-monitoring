@@ -1,36 +1,157 @@
-function addDevice() {
-    const name = document.getElementById('name').value;
-    const description = document.getElementById('description').value;
+let currentForm = 'iot';
+const selectElement = document.getElementById('selectConfig');
 
-    const connectionType = document.getElementById('connectionType').value;
+function loadIots(selectElement) {
+    let iotsList = null
+    fetch('/get/iot')
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error - status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Iot data:', data);
+        iotsList = data;
 
-    const location = document.getElementById('location').value;
+        iotsList.forEach(iot => {
+            let option = document.createElement('option')
+            option.value = iot.id;
+            option.textContent = iot.name;
+            selectElement.appendChild(option);
+        });
 
-    const voltageRating = document.getElementById('voltageRating').value;
-    const currentRating = document.getElementById('currentRating').value;
 
-    const highLowVoltage = document.getElementById('highLowVoltage').checked;
-    const overCurrent = document.getElementById('overCurrent').checked;
-    const powerOutage = document.getElementById('powerOutage').checked;
+    })
+    .catch(error => {
+        console.error('Failed to fetch iot data:', error);
+    });
+}
+function loadEntities() {
+    let entitiesList = null
+    fetch('/get/entity')
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error - status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Entity data:', data);
+        entitiesList = data;
 
-    const data = {
-        name: name,
-        description: description,
-        connectionType: connectionType,
-        location: location,
-        voltage: voltageRating,
-        currentRatingAmps: currentRating,
-        highLowVoltage: highLowVoltage,
-        overCurrent: overCurrent,
-        powerOutage: powerOutage
-    };
+        entitiesList.forEach(entity => {
+            let option = document.createElement('option')
+            option.value = entity.id;
+            option.textContent = entity.name;
+            selectElement.appendChild(option);
+        });
 
-    fetch('/add/device', {
+
+    })
+    .catch(error => {
+        console.error('Failed to fetch entity data:', error);
+    });
+}
+
+function fillIotForm(id) {
+    fetch('/get/iot/' + id)
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error - status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Iot data:', data);
+        document.getElementById('name').value = data.name;
+        document.getElementById('description').value = data.description;
+        document.getElementById('location').value = data.location;
+        document.getElementById('measureVoltage').checked = data.voltage;
+        document.getElementById('measureCurrent').checked = data.current;
+        document.getElementById('connectionType').value = data.protocol;
+    })
+    .catch(error => {
+        console.error('Failed to fetch iot data:', error);
+    });
+}
+
+function fillEntityForm(id) {
+    fetch('/get/entity/' + id)
+    .then(response => {
+        if (!response.ok) {
+        throw new Error(`HTTP error - status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Entity data:', data);
+        document.getElementById('name').value = data.name;
+        document.getElementById('description').value = data.description;
+        document.getElementById('location').value = data.location;
+        document.getElementById('voltageRating').value = data.voltageRating;
+        document.getElementById('currentRating').value = data.currentRating;
+        document.getElementById('highLowVoltage').checked = data.highLowVoltage;
+        document.getElementById('overCurrent').checked = data.overCurrent;
+        document.getElementById('powerOutage').checked = data.powerOutage;
+        document.getElementById('upperVoltageLimit').value = data.highVoltageValue;
+        document.getElementById('lowerVoltageLimit').value = data.lowVoltageValue;
+        document.getElementById('upperCurrentLimit').value = data.overCurrentValue;
+        document.getElementById('voltageIotId').value = data.voltageIotId;
+        document.getElementById('currentIotId').value = data.currentIotId;
+
+
+    })
+    .catch(error => {
+        console.error('Failed to fetch entity data:', error);
+    });
+}
+
+function gatherDeviceData() {
+    let formData = {};
+    let id = selectElement.value;
+    console.log(currentForm)
+  
+    if(currentForm == 'iot'){
+      formData = {
+          "name": document.getElementById('name').value,
+          "description": document.getElementById('description').value,
+          "protocol": document.getElementById('connectionType').value,
+          "location": document.getElementById('location').value,
+          "voltage": document.getElementById('measureVoltage').checked,
+          "current": document.getElementById('measureCurrent').checked
+      };
+      addIot(id, formData);
+    } else if(currentForm == 'entity'){
+      formData = {
+          "name": document.getElementById('name').value,
+          "description": document.getElementById('description').value,
+          "location": document.getElementById('location').value,
+          "voltageRating": document.getElementById('voltageRating').value,
+          "currentRating": document.getElementById('currentRating').value,
+          "highLowVoltage": document.getElementById('highLowVoltage').checked,
+          "overCurrent": document.getElementById('overCurrent').checked,
+          "powerOutage": document.getElementById('powerOutage').checked,
+          "highVoltageValue": document.getElementById('upperVoltageLimit').value,
+          "lowVoltageValue": document.getElementById('lowerVoltageLimit').value,
+          "overCurrentValue": document.getElementById('upperCurrentLimit').value,
+          "voltageIotId": document.getElementById('voltageIotId').value,
+          "currentIotId": document.getElementById('currentIotId').value
+      };
+      addEntity(id, formData);
+    }
+}
+
+function addIot(id, formData) {
+    console.log(id);
+    console.log(formData);
+
+    fetch('/create/iot', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(formData)
     })
     .then(response => {
         if (!response.ok) {
@@ -39,12 +160,44 @@ function addDevice() {
         return response.json();
     })
     .then(result => {
-        document.getElementById('response').innerHTML = '<p style="color: green;">Device added successfully!</p>' + JSON.stringify(result);
+        document.getElementById('response').innerHTML = '<p style="color: green;">Iot added successfully!</p>' + JSON.stringify(result);
     })
     .catch(error => {
         if (error instanceof Response) {
             error.json().then(errorData => {
-                document.getElementById('response').innerHTML = '<p style="color: red;">Error adding device: ' + JSON.stringify(errorData) + '</p>';
+                document.getElementById('response').innerHTML = '<p style="color: red;">Error adding iot: ' + JSON.stringify(errorData) + '</p>';
+            });
+        }
+        else {
+            document.getElementById('response').innerHTML = '<p style="color: red;">Network error: ' + error + '</p>';
+        }
+    });
+}
+
+function addEntity(id, formData) {
+    console.log(id);
+    console.log(formData);
+
+    fetch('/create/entity', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw response;
+        }
+        return response.json();
+    })
+    .then(result => {
+        document.getElementById('response').innerHTML = '<p style="color: green;">Entity added successfully!</p>' + JSON.stringify(result);
+    })
+    .catch(error => {
+        if (error instanceof Response) {
+            error.json().then(errorData => {
+                document.getElementById('response').innerHTML = '<p style="color: red;">Error adding entity: ' + JSON.stringify(errorData) + '</p>';
             });
         }
         else {
@@ -54,10 +207,13 @@ function addDevice() {
 }
 
 function displayConfigForm(form) {
+    currentForm = form;
+
     formContent = document.getElementById('configForm');
-    selectContent = document.getElementById('selectConfig');
     formContent.innerHTML = '';
-    selectContent.innerHTML = '';
+    selectElement.innerHTML = '';
+
+    document.getElementById(form+'_view_btn').classList.add('highlight');
 
     let htmlToInsert = `
         <label for="name">Name:</label>
@@ -71,63 +227,86 @@ function displayConfigForm(form) {
         `
 
     if(form == 'iot'){
+        document.getElementById('entity_view_btn').classList.remove('highlight');
         const newOption = document.createElement('option');
-        newOption.value = '';
+        newOption.value = 'new';
         newOption.textContent = 'New IoT';
-        selectContent.appendChild(newOption);
+        selectElement.appendChild(newOption);
 
         htmlToInsert += `
-        <label for="connectionType">Connection Type:</label>
-        <select id="connectionType" name="connectionType" required>
-            <option value="opc">OPC</option>
-            <option value="mqtt">MQTT</option>
-        </select>
-    
-        <label for="voltageRating">Voltage Rating (V):</label>
-        <input type="number" id="voltageRating" name="voltageRating">
-        <label for="currentRating">Current Rating (A):</label>
-        <input type="number" id="currentRating" name="currentRating">
-    
-        <label for="measureVoltage">Measures Voltage:</label>
-        <input type="checkbox" id="measureVoltage" name="measureVoltage">
-        <label for="measureCurrent">Measures Current:</label>
-        <input type="checkbox" id="measureCurrent" name="measureCurrent">
-    
-        <button type="button" onclick="addDevice()">Add IoT</button>
-      `;
-      formContent.innerHTML = htmlToInsert;
+            <label for="connectionType">Connection Type:</label>
+            <select id="connectionType" name="connectionType" required>
+                <option value="opc">OPC</option>
+                <option value="mqtt">MQTT</option>
+            </select>
+
+            <div class="group">
+                <label for="measureVoltage">Measures Voltage:</label>
+                <input type="checkbox" id="measureVoltage" name="measureVoltage">
+                <label for="measureCurrent">Measures Current:</label>
+                <input type="checkbox" id="measureCurrent" name="measureCurrent">
+            </div>
+        
+            <button type="button" onclick="gatherDeviceData()">Add IoT</button>
+        `;
+        formContent.innerHTML = htmlToInsert;
+        loadIots(selectElement);
     }
     else if(form == 'entity'){
+        document.getElementById('iot_view_btn').classList.remove('highlight');
         const newOption = document.createElement('option');
-        newOption.value = '';
+        newOption.value = 'new';
         newOption.textContent = 'New Entity';
-        selectContent.appendChild(newOption);
+        selectElement.appendChild(newOption);
 
-        htmlToInsert += `    
-        <label for="voltageRating">Voltage Rating (V):</label>
-        <input type="number" id="voltageRating" name="voltageRating">
-        <label for="currentRating">Current Rating (A):</label>
-        <input type="number" id="currentRating" name="currentRating">
+        htmlToInsert += `
+            <div class="group">
+                <label for="voltageRating">Voltage Rating (V):</label>
+                <input type="number" id="voltageRating" name="voltageRating">
+                <label for="currentRating">Current Rating (A):</label>
+                <input type="number" id="currentRating" name="currentRating">
+            </div>
 
-        <label for="upperVoltageLimit">Upper Voltage Limit (V):</label>
-        <input type="number" id="upperVoltageLimit" name="upperVoltageLimit">
-        <label for="lowerVoltageLimit">Lower Voltage Limit (V):</label>
-        <input type="number" id="lowerVoltageLimit" name="lowerVoltageLimit">
-        <label for="upperCurrentLimit">Upper Current Limit (A):</label>
-        <input type="number" id="upperCurrentLimit" name="upperCurrentLimit">
-    
-        <label for="highLowVoltage">Monitor Voltage:</label>
-        <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
-        <label for="overCurrent">Monitor Current:</label>
-        <input type="checkbox" id="overCurrent" name="overCurrent">
-        <label for="powerOutage">Monitor Power:</label>
-        <input type="checkbox" id="powerOutage" name="powerOutage">
-    
-        <button type="button" onclick="addDevice()">Add Entity</button>
-      `;
-      formContent.innerHTML = htmlToInsert;
+            <div class="group">
+                <label for="upperVoltageLimit">Upper Voltage Limit (V):</label>
+                <input type="number" id="upperVoltageLimit" name="upperVoltageLimit">
+                <label for="lowerVoltageLimit">Lower Voltage Limit (V):</label>
+                <input type="number" id="lowerVoltageLimit" name="lowerVoltageLimit">
+                <label for="upperCurrentLimit">Upper Current Limit (A):</label>
+                <input type="number" id="upperCurrentLimit" name="upperCurrentLimit">
+            </div>
 
+            <div class="group">
+                <label for="voltageIotId">Voltage Iot Id:</label>
+                <select id ="voltageIotId" name="voltageIotId"></select>
+                <label for="currentIotId">Current Iot Id:</label>
+                <select id ="currentIotId" name="currentIotId"></select>
+            </div>
+
+            <div class="group">
+                <label for="highLowVoltage">Monitor Voltage:</label>
+                <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
+                <label for="overCurrent">Monitor Current:</label>
+                <input type="checkbox" id="overCurrent" name="overCurrent">
+                <label for="powerOutage">Monitor Power:</label>
+                <input type="checkbox" id="powerOutage" name="powerOutage">
+            </div>
+        
+            <button type="button" onclick="gatherDeviceData()">Add Entity</button>
+        `;
+        formContent.innerHTML = htmlToInsert;
+        loadIots(document.getElementById('voltageIotId'));
+        loadIots(document.getElementById('currentIotId'));
+        loadEntities();
     }
 }
+
+selectElement.addEventListener('change', (event) => {
+    if( currentForm == 'iot'){
+        fillIotForm(event.target.value);
+    } else if(currentForm == 'entity'){
+        fillEntityForm(event.target.value);
+    }
+});
 
 displayConfigForm('iot');

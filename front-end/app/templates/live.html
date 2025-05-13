@@ -12,9 +12,12 @@
 <script src="{{ url_for('static', filename='script/live.js') }}" defer></script>
 {% endblock %}
 {% block content %}
-<select id="iot-select">
-    <option value="empty">Select IoT</option>
-</select>
+<div style="text-align: center;">
+    <select id="iot-select">
+        <option value="empty">Select IoT</option>
+    </select>
+</div>
+
 <div id="iot-charts">
     <div class="no-iot">
         No IoT selected

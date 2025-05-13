@@ -47,6 +47,17 @@ def get_iot_by_uid(uid):
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
 
+@app.route('/get/entity/', methods=['GET'])
+def get_entity():
+    try:
+        data = requests.get(f'http://device-management-system:9002/get/entity/')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
 @app.route('/get/entity/<UID>', methods=['GET'])
 def get_entity_by_uid(UID):
     try:
@@ -69,14 +80,14 @@ def get_event():
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
     
-@app.route('/add/device', methods=['POST'])
-def add_device():
+@app.route('/create/iot', methods=['POST'])
+def craete_iot():
     try:
-        logging.info("Adding device")
+        logging.info("Adding iot")
         data = request.get_json()
         logging.debug(data)
 
-        response = requests.post("http://devices:9002/device", json=data)
+        response = requests.post("http://device-management-system:9002/create/iot", json=data)
 
         if response.status_code == 201: 
             return jsonify(response.json()), 201
@@ -84,7 +95,26 @@ def add_device():
             return jsonify({"error": response.json()}), response.status_code
 
     except requests.exceptions.RequestException as e:
-        return jsonify({"error": f"Error communicating with Device Management API: {e}"}), 500
+        return jsonify({"error": f"Error communicating with Device Management System API: {e}"}), 500
+    except Exception as e:
+        return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
+    
+@app.route('/create/entity', methods=['POST'])
+def create_entity():
+    try:
+        logging.info("Adding entity")
+        data = request.get_json()
+        logging.debug(data)
+
+        response = requests.post("http://device-management-system:9002/create/entity", json=data)
+
+        if response.status_code == 201: 
+            return jsonify(response.json()), 201
+        else:
+            return jsonify({"error": response.json()}), response.status_code
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Error communicating with Device Management System API: {e}"}), 500
     except Exception as e:
         return jsonify({"error": f"An unexpected error occurred: {e}"}), 500
 
