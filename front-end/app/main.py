@@ -47,6 +47,17 @@ def get_iot_by_uid(uid):
     except ValueError:
         return jsonify({"error": "Invalid Json response"}), 500
 
+@app.route('/get/entity/', methods=['GET'])
+def get_entity():
+    try:
+        data = requests.get(f'http://device-management-system:9002/get/entity/')
+        data.raise_for_status()
+        return jsonify(data.json()), 200
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": str(e)}), 500 
+    except ValueError:
+        return jsonify({"error": "Invalid Json response"}), 500
+
 @app.route('/get/entity/<UID>', methods=['GET'])
 def get_entity_by_uid(UID):
     try:
