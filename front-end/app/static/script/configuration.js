@@ -239,11 +239,13 @@ function displayConfigForm(form) {
                 <option value="opc">OPC</option>
                 <option value="mqtt">MQTT</option>
             </select>
-        
-            <label for="measureVoltage">Measures Voltage:</label>
-            <input type="checkbox" id="measureVoltage" name="measureVoltage">
-            <label for="measureCurrent">Measures Current:</label>
-            <input type="checkbox" id="measureCurrent" name="measureCurrent">
+
+            <div class="group">
+                <label for="measureVoltage">Measures Voltage:</label>
+                <input type="checkbox" id="measureVoltage" name="measureVoltage">
+                <label for="measureCurrent">Measures Current:</label>
+                <input type="checkbox" id="measureCurrent" name="measureCurrent">
+            </div>
         
             <button type="button" onclick="gatherDeviceData()">Add IoT</button>
         `;
@@ -257,30 +259,38 @@ function displayConfigForm(form) {
         newOption.textContent = 'New Entity';
         selectElement.appendChild(newOption);
 
-        htmlToInsert += `    
-            <label for="voltageRating">Voltage Rating (V):</label>
-            <input type="number" id="voltageRating" name="voltageRating">
-            <label for="currentRating">Current Rating (A):</label>
-            <input type="number" id="currentRating" name="currentRating">
+        htmlToInsert += `
+            <div class="group">
+                <label for="voltageRating">Voltage Rating (V):</label>
+                <input type="number" id="voltageRating" name="voltageRating">
+                <label for="currentRating">Current Rating (A):</label>
+                <input type="number" id="currentRating" name="currentRating">
+            </div>
 
-            <label for="upperVoltageLimit">Upper Voltage Limit (V):</label>
-            <input type="number" id="upperVoltageLimit" name="upperVoltageLimit">
-            <label for="lowerVoltageLimit">Lower Voltage Limit (V):</label>
-            <input type="number" id="lowerVoltageLimit" name="lowerVoltageLimit">
-            <label for="upperCurrentLimit">Upper Current Limit (A):</label>
-            <input type="number" id="upperCurrentLimit" name="upperCurrentLimit">
+            <div class="group">
+                <label for="upperVoltageLimit">Upper Voltage Limit (V):</label>
+                <input type="number" id="upperVoltageLimit" name="upperVoltageLimit">
+                <label for="lowerVoltageLimit">Lower Voltage Limit (V):</label>
+                <input type="number" id="lowerVoltageLimit" name="lowerVoltageLimit">
+                <label for="upperCurrentLimit">Upper Current Limit (A):</label>
+                <input type="number" id="upperCurrentLimit" name="upperCurrentLimit">
+            </div>
 
-            <label for="voltageIotId">Voltage Iot Id:</label>
-            <select id ="voltageIotId" name="voltageIotId"></select>
-            <label for="currentIotId">Current Iot Id:</label>
-            <select id ="currentIotId" name="currentIotId"></select>
-        
-            <label for="highLowVoltage">Monitor Voltage:</label>
-            <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
-            <label for="overCurrent">Monitor Current:</label>
-            <input type="checkbox" id="overCurrent" name="overCurrent">
-            <label for="powerOutage">Monitor Power:</label>
-            <input type="checkbox" id="powerOutage" name="powerOutage">
+            <div class="group">
+                <label for="voltageIotId">Voltage Iot Id:</label>
+                <select id ="voltageIotId" name="voltageIotId"></select>
+                <label for="currentIotId">Current Iot Id:</label>
+                <select id ="currentIotId" name="currentIotId"></select>
+            </div>
+
+            <div class="group">
+                <label for="highLowVoltage">Monitor Voltage:</label>
+                <input type="checkbox" id="highLowVoltage" name="highLowVoltage">
+                <label for="overCurrent">Monitor Current:</label>
+                <input type="checkbox" id="overCurrent" name="overCurrent">
+                <label for="powerOutage">Monitor Power:</label>
+                <input type="checkbox" id="powerOutage" name="powerOutage">
+            </div>
         
             <button type="button" onclick="gatherDeviceData()">Add Entity</button>
         `;

@@ -4,7 +4,7 @@ h1 {
 }
 
 form {
-    width: 300px;
+    width: 500px;
     margin: 0 auto;
     padding: 20px;
     border-radius: 5px;
@@ -78,5 +78,17 @@ button:hover {
 }
 
 #selectConfig {
-    margin: auto;
+    margin: 0 auto 0 auto;
+    width: 500px;
+    font-size: x-large;
+    margin-top: 10px;
+}
+
+.group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.group *{
+    flex: 1;
 }
