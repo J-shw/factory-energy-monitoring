@@ -1,6 +1,9 @@
 # factory-energy-monitoring
 This is for my final year project at Bournemouth University (BU)
 
+## Architecture
+
+![FEM-MicroService-architecture drawio](https://github.com/user-attachments/assets/51f43e16-e225-4822-96af-b909977a1d3d)
 
 ## Web
 ![Screenshot 2025-03-18 at 15-55-39 FEMS - Home](https://github.com/user-attachments/assets/1d4b68d2-6d96-4a5b-84ab-9cf7ae877abb)

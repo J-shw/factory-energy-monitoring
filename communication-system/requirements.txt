@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+requests
+python-socketio[client]
+sqlalchemy
+pydantic
+psycopg2-binary
+paho-mqtt
+asyncua

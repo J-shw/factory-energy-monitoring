@@ -23,28 +23,25 @@ jobs:
     strategy:
       matrix:
         image:
-          - database-management-system
-          - web-socket-server
+          - database-server
           - analysis-system
           - communication-system
           - device-management-system
-          - web-ui
-          - fake-data-system
+          - front-end
+          - device-emulator
         include:
-          - image: database-management-system
-            context: ./database
-          - image: web-socket-server
-            context: ./web-socket
+          - image: database-server
+            context: ./database-server
           - image: analysis-system
-            context: ./analysis
+            context: ./analysis-system
           - image: communication-system
-            context: ./communication
+            context: ./communication-system
           - image: device-management-system
-            context: ./devices
-          - image: web-ui
-            context: ./web
-          - image: fake-data-system
-            context: ./fake-data
+            context: ./device-management-system
+          - image: front-end
+            context: ./front-end
+          - image: iot-emulator
+            context: ./iot-emulator
 
     steps:
       - name: Checkout repository

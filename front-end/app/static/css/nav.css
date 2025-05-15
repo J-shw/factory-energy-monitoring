@@ -1,0 +1,19 @@
+nav {
+    display: flex;
+    gap: 20px;
+    background-color: var(--foreground);
+    color: var(--text);
+    padding: 15px 20px;
+}
+
+.nav-option {
+    padding: 10px 15px;
+    border-radius: 5px; 
+    text-decoration: none; 
+    color: var(--text);
+}
+
+.nav-option:hover {
+    background-color: var(--buttonhover);
+    cursor: pointer;
+}

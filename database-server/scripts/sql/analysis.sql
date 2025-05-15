@@ -1,0 +1,1 @@
+CREATE DATABASE factory_energy_events;

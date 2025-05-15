@@ -1,0 +1,39 @@
+#iot-charts .collection {
+    display: flex;
+}
+#iot-charts .collection .chart-container {
+    flex: 1;
+    height: 300px;
+    margin: 20px auto; 
+    box-sizing: border-box;
+}
+
+.no-iot {
+    padding: 15px;
+    text-align: center;
+    background-color: var(--foreground);
+    color: var(--text);
+    border-radius: 5px;
+    font-size: x-large;
+    width: 350px;
+    margin: auto;
+}
+
+select {
+    background-color: var(--input);
+    padding: 8px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 3px;
+    box-sizing: border-box;
+    color: var(--text);
+    cursor: pointer;
+}
+
+#iot-select {
+    margin: 0 auto 0 auto;
+    width: 500px;
+    font-size: x-large;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}

@@ -10,60 +10,63 @@ services:
     volumes:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
-  db:
-    image: ghcr.io/j-shw/database-management-system:latest
-    build: ./database
+  opcua-server:
+    build: ./opcua-server
+    ports:
+      - "4840:4840"
+  database-server:
+    image: ghcr.io/j-shw/database-server:latest
+    build: ./database-server
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
-  analysis:
+  analysis-system:
     image: ghcr.io/j-shw/analysis-system:latest
-    build: ./analysis
+    build: ./analysis-system
     ports:
       - "9090:9090"
     depends_on:
-      - db
+      - database-server
     environment:
-      DATABASE_URL: "postgres:password@db"
-  devices:
+      DATABASE_URL: "postgres:password@database-server"
+  device-management-system:
     image: ghcr.io/j-shw/device-management-system:latest
-    build: ./devices
+    build: ./device-management-system
     ports:
       - "9002:9002"
     depends_on:
-      - db
+      - database-server
     environment:
-      DATABASE_URL: "postgres:password@db"
-  web-socket:
-    image: ghcr.io/j-shw/web-socket-server:latest
-    build: ./web-socket
-    ports:
-      - "8000:8000"
-  web:
-    image: ghcr.io/j-shw/web-ui:latest
-    build: ./web
+      DATABASE_URL: "postgres:password@database-server"
+  front-end:
+    image: ghcr.io/j-shw/front-end:latest
+    build: ./front-end
     ports:
       - "8080:8080"
-    depends_on:
-      - web-socket
-  
-  communication:
+  communication-system:
     image: ghcr.io/j-shw/communication-system:latest
-    build: ./communication
+    build: ./communication-system
     depends_on:
       - mosquitto
-      - web-socket
-      - analysis
+      - front-end
+      - opcua-server
+      - analysis-system
+    ports:
+      - "9000:9000"
     environment:
       MQTT_BROKER_HOST: mosquitto
+      OPC_UA_SERVER_HOST: opcua-server
+      DATABASE_URL: "postgres:password@database-server"
 
-  fake-data:
-    image: ghcr.io/j-shw/fake-data-system:latest
-    build: ./fake-data
+  iot-emulator:
+    image: ghcr.io/j-shw/iot-emulator:latest
+    build: ./iot-emulator
     depends_on:
       - mosquitto
-      - devices
+      - opcua-server
+      - device-management-system
     environment:
       MQTT_BROKER_HOST: mosquitto
+      OPC_UA_SERVER_HOST: opcua-server
