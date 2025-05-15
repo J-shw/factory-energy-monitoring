@@ -5,33 +5,82 @@ This is for my final year project at Bournemouth University (BU)
 
 ![FEM-MicroService-architecture drawio](https://github.com/user-attachments/assets/51f43e16-e225-4822-96af-b909977a1d3d)
 
-## Web
-![Screenshot 2025-03-18 at 15-55-39 FEMS - Home](https://github.com/user-attachments/assets/1d4b68d2-6d96-4a5b-84ab-9cf7ae877abb)
-
-- Dynamically generated graph
+## Front-End System
+### Live data feeds
+![live-view](https://github.com/user-attachments/assets/ac15d7b4-ec2c-463b-880d-ba2c72c1de5d)
 - Real-time data updates using websockets
 - Simple, modern graphs
-
-## Device system
+### Events view
+![events](https://github.com/user-attachments/assets/a3042c6d-878e-4233-9142-a57215d0c749)
+- Quick and simple table view 
+### Entity and IoT configuration
+![iot-config](https://github.com/user-attachments/assets/d5c91f4a-4f0d-4636-a901-a9a790437f70)
+![entity-config](https://github.com/user-attachments/assets/ad59c69d-0c37-4f23-a047-91f9d9e101f6)
+- Easy configuration
+## Device Management System
 - Allows CRUD on device models
 - View all created devices
 - View specific device
 - HTTP API
 
-## Fake data system
-- Simulates MQTT device messages
-- Uses created devices from device system
-- Sends random data to randomly selected devices at random intervals
+## IoT Emulation System
+- Emulates IoT devices to showcase data flow and help development
+- Uses created IoT's from Device Management System
+- Sends random data as randomly selected IoTs with random intervals
 
-## Commmunication system
+## Commmunication System
 - Central data acquisition system
-- Relays different protocls to web socket for live data and HTTP for storage
+- Relays different protocols to web socket for live data and HTTP for storage
 
-## Analysis system
+## Analysis System
 - Stores all device data
 - HTTP API
 - Analyises data *Not yet made*
 
-## DB system
+## Database Server
 - Postgress database
 - Shell script for initialisation
+
+## OPC-UA Server
+- Hosts an OPC UA server 
+- Allows dynamic OPC device assignment 
+- Provides subscriptions to data flows
+
+
+# Setup
+
+## Mosquitto Configuration File
+
+The Mosquitto service requires a configuration file to run correctly. Before you run `docker-compose up`, you need to create a specific folder structure and file.
+
+Create a directory named `data` in the same folder as your `docker-compose.yml` file. Inside `data`, create another folder called `mosquitto`. Inside `mosquitto`, create a file named `mosquitto.conf`.
+
+The structure should look like this:
+```
+/your-project-folder/
+├── docker-compose.yml
+└── data/
+    └── mosquitto/
+        └── mosquitto.conf
+```
+
+Inside the `mosquitto.conf` file, add these two lines:
+
+```conf
+listener 1883
+allow_anonymous true
+```
+
+## Docker
+
+Quickly set up using the `docker-compose.yml` file.
+
+* **Use existing images:**
+    ```bash
+    docker-compose up -d
+    ```
+* **Build images locally:** (Requires source files)
+    ```bash
+    docker-compose build
+    docker-compose up -d
+    ```
