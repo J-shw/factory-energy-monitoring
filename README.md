@@ -5,13 +5,18 @@ This is for my final year project at Bournemouth University (BU)
 
 ![FEM-MicroService-architecture drawio](https://github.com/user-attachments/assets/51f43e16-e225-4822-96af-b909977a1d3d)
 
-## Web
-![Screenshot 2025-03-18 at 15-55-39 FEMS - Home](https://github.com/user-attachments/assets/1d4b68d2-6d96-4a5b-84ab-9cf7ae877abb)
-
-- Dynamically generated graph
+## Front-End System
+### Live data feeds
+![live-view](https://github.com/user-attachments/assets/ac15d7b4-ec2c-463b-880d-ba2c72c1de5d)
 - Real-time data updates using websockets
 - Simple, modern graphs
-
+### Events view
+![events](https://github.com/user-attachments/assets/a3042c6d-878e-4233-9142-a57215d0c749)
+- Quick and simple table view 
+### Entity and IoT configuration
+![iot-config](https://github.com/user-attachments/assets/d5c91f4a-4f0d-4636-a901-a9a790437f70)
+![entity-config](https://github.com/user-attachments/assets/ad59c69d-0c37-4f23-a047-91f9d9e101f6)
+- Easy configuration
 ## Device Management System
 - Allows CRUD on device models
 - View all created devices
