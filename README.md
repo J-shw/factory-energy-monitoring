@@ -45,3 +45,20 @@ This is for my final year project at Bournemouth University (BU)
 - Hosts an OPC UA server 
 - Allows dynamic OPC device assignment 
 - Provides subscriptions to data flows
+
+
+# Setup
+
+## Docker
+
+Quickly set up using the `docker-compose.yml` file.
+
+* **Use existing images:**
+    ```bash
+    docker-compose up -d
+    ```
+* **Build images locally:** (Requires source files)
+    ```bash
+    docker-compose build
+    docker-compose up -d
+    ```
