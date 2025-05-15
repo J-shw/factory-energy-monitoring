@@ -12,26 +12,31 @@ This is for my final year project at Bournemouth University (BU)
 - Real-time data updates using websockets
 - Simple, modern graphs
 
-## Device system
+## Device Management System
 - Allows CRUD on device models
 - View all created devices
 - View specific device
 - HTTP API
 
-## Fake data system
-- Simulates MQTT device messages
-- Uses created devices from device system
-- Sends random data to randomly selected devices at random intervals
+## IoT Emulation System
+- Emulates IoT devices to showcase data flow and help development
+- Uses created IoT's from Device Management System
+- Sends random data as randomly selected IoTs with random intervals
 
-## Commmunication system
+## Commmunication System
 - Central data acquisition system
-- Relays different protocls to web socket for live data and HTTP for storage
+- Relays different protocols to web socket for live data and HTTP for storage
 
-## Analysis system
+## Analysis System
 - Stores all device data
 - HTTP API
 - Analyises data *Not yet made*
 
-## DB system
+## Database Server
 - Postgress database
 - Shell script for initialisation
+
+## OPC-UA Server
+- Hosts an OPC UA server 
+- Allows dynamic OPC device assignment 
+- Provides subscriptions to data flows
