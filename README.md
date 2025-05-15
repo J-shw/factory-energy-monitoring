@@ -49,6 +49,28 @@ This is for my final year project at Bournemouth University (BU)
 
 # Setup
 
+## Mosquitto Configuration File
+
+The Mosquitto service requires a configuration file to run correctly. Before you run `docker-compose up`, you need to create a specific folder structure and file.
+
+Create a directory named `data` in the same folder as your `docker-compose.yml` file. Inside `data`, create another folder called `mosquitto`. Inside `mosquitto`, create a file named `mosquitto.conf`.
+
+The structure should look like this:
+```
+/your-project-folder/
+├── docker-compose.yml
+└── data/
+    └── mosquitto/
+        └── mosquitto.conf
+```
+
+Inside the `mosquitto.conf` file, add these two lines:
+
+```conf
+listener 1883
+allow_anonymous true
+```
+
 ## Docker
 
 Quickly set up using the `docker-compose.yml` file.
