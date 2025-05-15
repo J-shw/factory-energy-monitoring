@@ -11,6 +11,7 @@ services:
       - ./data/mosquitto:/etc/mosquitto
       - ./data/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
   opcua-server:
+    image: ghcr.io/j-shw/opcua-server:latest
     build: ./opcua-server
     ports:
       - "4840:4840"
@@ -59,7 +60,6 @@ services:
       MQTT_BROKER_HOST: mosquitto
       OPC_UA_SERVER_HOST: opcua-server
       DATABASE_URL: "postgres:password@database-server"
-
   iot-emulator:
     image: ghcr.io/j-shw/iot-emulator:latest
     build: ./iot-emulator
