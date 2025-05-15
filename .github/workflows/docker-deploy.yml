@@ -28,7 +28,8 @@ jobs:
           - communication-system
           - device-management-system
           - front-end
-          - device-emulator
+          - iot-emulator
+          - opcua-server
         include:
           - image: database-server
             context: ./database-server
@@ -41,7 +42,9 @@ jobs:
           - image: front-end
             context: ./front-end
           - image: iot-emulator
-            context: ./iot-emulator
+            context: ./IoT-emulator
+          - image: opcua-server
+            context: ./opcua-server
 
     steps:
       - name: Checkout repository
